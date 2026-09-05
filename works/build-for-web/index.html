@@ -1,0 +1,630 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Foundational Skills · 全景图谱</title>
+<style>
+  :root{
+    --bg:#F5F0EB; --card:#FDFAF6; --ink:#3D3A36; --muted:#8A8178;
+    --accent:#5CB88A; --accent-soft:rgba(92,184,138,.12);
+    --ai:#7B6BB5; --ai-soft:rgba(123,107,181,.08);
+    --solid:rgba(91,185,140,.55); --solid-on:#3FA373;
+    --dash:rgba(210,150,90,.65);
+    --dash-ai:rgba(123,107,181,.55);
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:var(--bg);color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Hiragino Sans GB","Helvetica Neue",sans-serif;line-height:1.65}
+  ::selection{background:var(--accent);color:#fff}
+  .container{max-width:1180px;margin:0 auto;padding:0 24px}
+
+  /* 字号阶梯 (4px baseline): 11 / 12 / 13 / 14 / 15 / 22 / 26 */
+  header{padding:44px 0 4px}
+  .kicker{font-size:11px;letter-spacing:2px;color:var(--accent);font-weight:600;text-transform:uppercase;margin-bottom:10px}
+  h1{font-size:26px;font-weight:700;letter-spacing:-0.5px;margin-bottom:6px;line-height:1.25}
+  .source{font-size:13px;color:var(--muted);margin-bottom:18px;line-height:1.6}
+
+  /* ===== 顶部 Editor's Brief ===== */
+  .brief{background:var(--card);border-radius:14px;padding:18px 22px;margin-bottom:14px;
+    border-left:4px solid var(--accent);box-shadow:0 1px 4px rgba(0,0,0,.04)}
+  .brief-label{font-size:11px;font-weight:600;color:var(--accent);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:8px}
+  .brief p{font-size:14px;line-height:1.8;margin-bottom:8px;color:var(--ink)}
+  .brief p:last-child{margin-bottom:0}
+  .brief strong{font-weight:600}
+  .brief .ai-mark{color:var(--ai);font-weight:600}
+
+  /* ===== 域标题（三个能力域）===== */
+  .domain{margin-top:30px;margin-bottom:14px}
+  .domain-head{display:flex;align-items:center;gap:12px;margin-bottom:6px}
+  .domain-head .bar{width:5px;height:20px;border-radius:3px;background:var(--c)}
+  .domain-head h2{font-size:15px;font-weight:600;letter-spacing:.2px}
+  .domain-head .cnt{font-size:12px;color:var(--muted);font-weight:400;margin-left:6px}
+  .domain-note{font-size:12px;color:var(--muted);line-height:1.6;margin-bottom:12px;padding-left:17px}
+
+  /* ===== 网格 ===== */
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:14px;position:relative}
+  .grid-wrap{position:relative;z-index:1}
+
+  /* ===== 节点卡片 ===== */
+  .node{background:var(--card);border-radius:16px;padding:15px 16px 13px 19px;
+    border-left:4px solid var(--c,#ccc);box-shadow:0 1px 4px rgba(0,0,0,.05);
+    cursor:pointer;transition:box-shadow .25s,transform .25s,opacity .25s;
+    opacity:0;animation:fadeUp .5s forwards;animation-delay:var(--d,0s)}
+  @keyframes fadeUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+  .node.ai-node{background:#FBF8FE;border-left-color:var(--ai)}
+  .node:hover{box-shadow:0 6px 20px rgba(0,0,0,.08);transform:translateY(-3px)}
+  .node.active{box-shadow:0 0 0 2px var(--accent) inset,0 6px 20px rgba(0,0,0,.08)}
+  .node.ai-node.active{box-shadow:0 0 0 2px var(--ai) inset,0 6px 20px rgba(0,0,0,.08)}
+  .node h3{font-size:15px;font-weight:600;margin-bottom:5px;display:flex;align-items:center;gap:6px;line-height:1.4}
+  .node .emoji{font-size:16px}
+  .node .badge{font-size:11px;font-weight:600;padding:2px 8px;border-radius:999px;margin-left:auto;letter-spacing:.3px;flex-shrink:0;line-height:1.4;background:rgba(92,184,138,.15);color:#3FA373}
+  .node .badge-ai{background:rgba(123,107,181,.15);color:var(--ai)}
+  .node .desc{font-size:13px;color:var(--muted);line-height:1.55;margin-bottom:9px}
+  .node .details{font-size:13.5px;color:var(--ink);line-height:1.7;max-height:0;overflow:hidden;transition:max-height .35s ease,margin .25s}
+  .node.active .details{max-height:380px;margin-top:9px;padding-top:9px;border-top:1px dashed rgba(0,0,0,.08)}
+  .node .details ul{margin:0;padding-left:16px}
+  .node .details li{margin-bottom:4px}
+  .node .details .res{color:var(--accent);font-weight:500}
+  .node.dim{opacity:.25;transform:scale(.98)}
+
+  /* ties：默认隐藏旁支与 AI 关联，主干可见 */
+  .node .ties{display:flex;gap:5px;flex-wrap:wrap;margin-top:11px;padding-top:9px;border-top:1px solid rgba(0,0,0,.05)}
+  .node .ties span{font-size:12px;color:var(--muted);background:rgba(0,0,0,.04);padding:3px 9px;border-radius:999px;line-height:1.4}
+  .node .ties span.sec{display:none}
+  .show-dash .node .ties span.sec{display:inline-block}
+  .node .ties span.ai-tie{display:none}
+  .show-ai .node .ties span.ai-tie{display:inline-block}
+
+  /* ===== 详情面板 ===== */
+  .panel{background:var(--card);border-radius:14px;padding:0 20px;margin:0 0 20px;
+    border-left:4px solid var(--accent);box-shadow:0 1px 4px rgba(0,0,0,.04);
+    max-height:0;overflow:hidden;transition:max-height .35s ease,padding .25s}
+  .panel.open{padding:16px 20px;max-height:400px}
+  .panel.ai{border-left-color:var(--ai)}
+  .panel .p-label{font-size:11px;font-weight:600;letter-spacing:1px;text-transform:uppercase;color:var(--accent);margin-bottom:6px}
+  .panel.ai .p-label{color:var(--ai)}
+  .panel p{font-size:14px;line-height:1.8;color:var(--ink)}
+  .panel strong{font-weight:600}
+  .panel .empty{color:var(--muted);font-size:13px}
+
+  /* ===== 连线与舞台 ===== */
+  .stage{position:relative;margin:8px 0 40px}
+  svg.links{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;z-index:0}
+
+  .edge-solid{stroke:var(--solid);stroke-width:1.5;fill:none;transition:stroke .3s,opacity .3s}
+  .edge-dash{stroke:var(--dash);stroke-width:1.2;stroke-dasharray:4 5;fill:none;opacity:0;transition:opacity .3s}
+  .edge-ai{stroke:var(--dash-ai);stroke-width:1.3;stroke-dasharray:6 4;fill:none;opacity:0;transition:opacity .3s}
+  .show-dash .edge-dash{opacity:.55}
+  .show-ai .edge-ai{opacity:.55}
+  .focus .edge-solid{opacity:.1}
+  .focus .edge-solid.hot{opacity:1;stroke:var(--solid-on);stroke-width:2.5}
+  .focus .edge-dash.hot{opacity:.95;animation:dashFlow 1s linear infinite}
+  .focus .edge-ai.hot{opacity:1;animation:dashFlow 1s linear infinite}
+  @keyframes dashFlow{to{stroke-dashoffset:-9}}
+
+  /* ===== 工具栏 ===== */
+  .toolbar{display:flex;gap:10px;align-items:center;margin:18px 0 4px;flex-wrap:wrap}
+  .btn{font-size:13px;padding:7px 15px;border-radius:999px;border:1px solid var(--accent);background:transparent;color:var(--accent);cursor:pointer;transition:.2s;font-family:inherit;line-height:1.4}
+  .btn:hover{background:var(--accent-soft)}
+  .btn.on{background:var(--accent);color:#fff;border-color:var(--accent)}
+  .btn.ai-btn{border-color:var(--ai);color:var(--ai)}
+  .btn.ai-btn:hover{background:var(--ai-soft)}
+  .btn.ai-btn.on{background:var(--ai);color:#fff;border-color:var(--ai)}
+  .legend{font-size:12px;color:var(--muted);display:flex;gap:16px;align-items:center;flex-wrap:wrap}
+  .legend-item{display:flex;align-items:center;gap:6px}
+  .legend-line{width:22px;height:2px;border-radius:2px}
+  .legend-line.solid{background:var(--solid-on)}
+  .legend-line.dash{background:var(--dash);background-image:linear-gradient(90deg,var(--dash) 50%,transparent 50%);background-size:6px 2px}
+  .legend-line.ai-line{background:var(--dash-ai);background-image:linear-gradient(90deg,var(--dash-ai) 50%,transparent 50%);background-size:6px 2px}
+
+  .toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(20px);background:rgba(61,58,54,.92);color:#fff;font-size:13px;line-height:1.5;padding:11px 18px;border-radius:999px;opacity:0;transition:.3s;pointer-events:none;white-space:nowrap;z-index:100}
+  .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+  .empty-hint{font-size:12px;color:var(--muted);opacity:.7;margin:6px 0 0}
+
+  @media(max-width:600px){
+    .container{padding:0 16px}
+    header{padding-top:30px}
+    h1{font-size:22px}
+    .source,.brief p{font-size:13px}
+    .brief,.panel.open{padding:14px 16px}
+    .panel p{font-size:13px}
+    .node h3{font-size:14px}
+    .node .desc,.node .details{font-size:13px}
+    .legend{gap:8px 14px}
+  }
+</style>
+</head>
+<body>
+<div class="container">
+  <header>
+    <div class="kicker">Foundational Skills</div>
+    <h1>数字创作者的基础技能 · 全景图谱</h1>
+    <div class="source">取自 Tyler Angert《Foundational Skills》全文 · 结合 2025–2026 AI 发展延伸</div>
+
+    <div class="brief">
+      <div class="brief-label">Editor's Brief</div>
+      <p>Angert 把过去 5–10 年最有用的技能归为 <strong>Computing、Design、Writing</strong> 三大域——它们互相补位，让一个人能从 0→1 快速把东西做出来。这不是线性课程，而是<strong>按优先级排序的能力地图</strong>：Computing 里，Web 是最高复利的选择；Design 里，信息设计是跨媒介的底层能力；Writing 里，写作即原型、类比即认知。三者交汇于同一个原则：<strong>先理解原语，再拥抱抽象</strong>。</p>
+      <p><span class="ai-mark">紫色节点</span>是把这套框架放到 2025–2026 AI 语境下的延伸：Vibe Coding 重写原型阶段，Prompt 成为新原语，Agents/MCP 重构工具链，但<strong>「判断力 > 生成力」的排序反而被强化</strong>——你越懂原语，越能驾驭 AI。<strong>点任意卡片</strong>，下方展开该节点的编辑解读。</p>
+    </div>
+  </header>
+
+  <!-- 详情面板 -->
+  <div class="panel" id="panel">
+    <div class="p-label" id="panelLabel">Editor's Take</div>
+    <p id="panelBody"><span class="empty">点击任意卡片查看该节点的编辑解读与原文要点。</span></p>
+  </div>
+
+  <div class="toolbar">
+    <button class="btn" id="dashToggle">🔗 显示旁支（橙色）</button>
+    <button class="btn ai-btn" id="aiToggle">🤖 显示 AI 连线（紫色）</button>
+    <button class="btn" id="resetBtn">↺ 重置</button>
+    <div class="legend">
+      <span class="legend-item"><span class="legend-line solid"></span>学习主干</span>
+      <span class="legend-item"><span class="legend-line dash"></span>旁支 / 延伸</span>
+      <span class="legend-item"><span class="legend-line ai-line"></span>AI 放大</span>
+    </div>
+  </div>
+
+  <div class="stage" id="stage">
+    <svg class="links" id="svg"></svg>
+
+    <!-- ===== 域 1：Computing ===== -->
+    <div class="domain" style="--c:#5CB88A">
+      <div class="domain-head"><span class="bar"></span><h2>① Computing <span class="cnt">计算 · 6 节点</span></h2></div>
+      <div class="domain-note">Web 是最高复利的选择；核心是理解原语（DOM、函数、数据建模），而非记住 API。</div>
+      <div class="grid-wrap">
+        <div class="grid" id="gridCompute">
+
+          <div class="node" data-id="why" style="--c:#E8A75D;--d:0s">
+            <h3><span class="emoji">🌍</span> Why Build for the Web <span class="badge">原文</span></h3>
+            <div class="desc">可移植、跨端、技能复利</div>
+            <div class="details"><ul>
+              <li>分发快、更新快，默认跨平台</li>
+              <li>80–90% 项目可共用一个栈（如 React）→ 复利</li>
+              <li>工具生态庞大、社区全球最大</li>
+              <li>市场信号：WASM、协作应用常态化</li>
+              <li>对比：Unity/Flutter 有各自优势，但 Web 便携性无出其右</li>
+            </ul></div>
+            <div class="ties"><span>→ HTML & CSS</span><span class="sec">↔ Primitives</span><span class="ai-tie">↔ Vibe Coding</span></div>
+          </div>
+
+          <div class="node" data-id="html" style="--c:#5CB88A;--d:.05s">
+            <h3><span class="emoji">📐</span> HTML & CSS <span class="badge">原文</span></h3>
+            <div class="desc">低门槛高天花板，一切 UI 的地基</div>
+            <div class="details"><ul>
+              <li>先学基础 HTML/CSS</li>
+              <li>Markup/styling 思维是通用语言（SwiftUI 同理）</li>
+              <li>SVG、CSS Animations 无需特殊工具即可试错</li>
+              <li>「能在浏览器里直接 tinker」是 Web 最被低估的优势</li>
+            </ul></div>
+            <div class="ties"><span>← Why</span><span>→ JavaScript</span><span class="sec">↔ MCP</span><span class="sec">↔ Primitives</span><span class="ai-tie">↔ Vibe Coding</span></div>
+          </div>
+
+          <div class="node" data-id="js" style="--c:#6B9BD2;--d:.1s">
+            <h3><span class="emoji">⚡</span> JavaScript & DOM <span class="badge">原文</span></h3>
+            <div class="desc">不靠库做原型，理解浏览器执行模型</div>
+            <div class="details"><ul>
+              <li>先无库做原型</li>
+              <li>理解 DOM 是什么、如何操作</li>
+              <li>理解浏览器如何执行代码（事件循环等）</li>
+              <li>不依赖库也能做简单交互</li>
+              <li>资源：<span class="res">Just JavaScript</span>（Abramov & Appleton）</li>
+            </ul></div>
+            <div class="ties"><span>← HTML</span><span>→ Framework</span><span class="sec">↔ D3</span><span class="sec">↔ Backend</span><span class="sec">↔ Functions</span><span class="ai-tie">↔ Review</span></div>
+          </div>
+
+          <div class="node" data-id="framework" style="--c:#A87FD6;--d:.15s">
+            <h3><span class="emoji">⚛️</span> 现代 UI 框架 <span class="badge">原文</span></h3>
+            <div class="desc">React / Vue / Svelte，选一个深入</div>
+            <div class="details"><ul>
+              <li>选一个：React / Vue / Svelte</li>
+              <li>基础扎实后引入 TypeScript</li>
+              <li>框架是抽象，不是捷径——顺序不能反</li>
+            </ul></div>
+            <div class="ties"><span>← JavaScript</span><span class="sec">↔ MCP</span><span class="sec">↔ Backend</span><span class="ai-tie">↔ Agents</span></div>
+          </div>
+
+          <div class="node" data-id="backend" style="--c:#D66B6B;--d:.2s">
+            <h3><span class="emoji">🗄️</span> 后端基础 <span class="badge">原文</span></h3>
+            <div class="desc">进阶再说，深入必学</div>
+            <div class="details"><ul>
+              <li>基础数据建模</li>
+              <li>REST / GraphQL API 交互</li>
+              <li>WebSocket / Webhook 理解</li>
+              <li>Angert：工具变化快，先保前端基础</li>
+              <li>数据库、realtime 属此范畴</li>
+            </ul></div>
+            <div class="ties"><span class="sec">↔ JS</span><span class="sec">↔ Framework</span><span class="sec">↔ MCP</span><span class="sec">↔ Functions</span><span class="ai-tie">↔ BaaS</span></div>
+          </div>
+
+          <div class="node" data-id="viz" style="--c:#E8A75D;--d:.25s">
+            <h3><span class="emoji">📊</span> 数据可视化 <span class="badge">原文</span></h3>
+            <div class="desc">D3.js，需要时再学</div>
+            <div class="details"><ul>
+              <li>原文举例：<span class="res">D3.js</span></li>
+              <li>建立在 JS + SVG 基础之上</li>
+              <li>非独立阶段，属信息设计实践</li>
+            </ul></div>
+            <div class="ties"><span class="sec">↔ JavaScript</span><span class="ai-tie">↔ Agents</span></div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== 域 2：Core Concepts ===== -->
+    <div class="domain" style="--c:#3D3A36">
+      <div class="domain-head"><span class="bar"></span><h2>② Core Concepts <span class="cnt">核心概念 · 2 节点</span></h2></div>
+      <div class="domain-note">原文独立小节。一切系统 = 原语 + 抽象；一切过程 = 输入 → 函数 → 输出。这是贯穿所有域的元能力。</div>
+      <div class="grid-wrap">
+        <div class="grid" id="gridConcepts">
+
+          <div class="node" data-id="primitives" style="--c:#3D3A36;--d:.3s">
+            <h3><span class="emoji">🧱</span> 原语与抽象 <span class="badge">原文</span></h3>
+            <div class="desc">Primitives & Abstractions，元能力</div>
+            <div class="details"><ul>
+              <li>所有系统 = 原语（积木）+ 抽象（组合方式）</li>
+              <li>Lego: Bricks → Buildings；Music: Notes → Chords</li>
+              <li>好抽象隐藏内部，让更多人可贡献</li>
+              <li>能拆解问题 → 能设计好 API 与 UI</li>
+              <li>不特定于 Web，但支撑一切</li>
+            </ul></div>
+            <div class="ties"><span>↔ HTML</span><span class="sec">↔ JS</span><span class="sec">↔ Framework</span><span class="sec">↔ Backend</span><span class="sec">↔ Functions</span><span class="ai-tie">↔ Prompt</span></div>
+          </div>
+
+          <div class="node" data-id="functions" style="--c:#4A6B8A;--d:.35s">
+            <h3><span class="emoji">🔄</span> 函数与输入输出 <span class="badge">原文</span></h3>
+            <div class="desc">Functions & Input/Output，过程即变换</div>
+            <div class="details"><ul>
+              <li>函数 = 输入 → 处理 → 输出</li>
+              <li>Blender: fruits → smoothie；分类器: 图片 → 是/否</li>
+              <li>File I/O、Unix pipes、Client/Server、REPL 皆如此</li>
+              <li>把目标建模为「输入 → 期望输出」的变换</li>
+              <li>Chatbot、搜索引擎、浏览器 URL 都是函数</li>
+            </ul></div>
+            <div class="ties"><span>↔ JS</span><span class="sec">↔ Backend</span><span class="sec">↔ Primitives</span><span class="sec">↔ Writing</span><span class="ai-tie">↔ Prompt</span></div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== 域 3：Design & Writing ===== -->
+    <div class="domain" style="--c:#E8A75D">
+      <div class="domain-head"><span class="bar"></span><h2>③ Design & Writing <span class="cnt">设计 · 写作 · 3 节点</span></h2></div>
+      <div class="domain-note">信息设计是跨媒介的底层能力；写作是原型工具，类比是认知核心。Angert 反复强调：自然语言应与代码、草图并列为主要创作媒介。</div>
+      <div class="grid-wrap">
+        <div class="grid" id="gridDesign">
+
+          <div class="node" data-id="design" style="--c:#E8A75D;--d:.4s">
+            <h3><span class="emoji">🎨</span> 视觉与信息设计 <span class="badge">原文</span></h3>
+            <div class="desc">Graphic, Visual & Information Design</div>
+            <div class="details"><ul>
+              <li>不必是视觉大师，但要懂基础</li>
+              <li>现代 UI 设计基于图形 + 信息设计</li>
+              <li>排版、留白、层级 = 写作中的分段与句式变化</li>
+              <li>绘图、图解、草图是设计师的 table-stakes</li>
+              <li>FigJam、BioRender、Keynote 验证了可视化工具的市场</li>
+            </ul></div>
+            <div class="ties"><span>↔ Viz</span><span class="sec">↔ Writing</span><span class="ai-tie">↔ Vibe Coding</span></div>
+          </div>
+
+          <div class="node" data-id="writing" style="--c:#D67B4A;--d:.45s">
+            <h3><span class="emoji">✍️</span> 写作即原型 <span class="badge">原文</span></h3>
+            <div class="desc">Writing as a Tool，主要创作媒介</div>
+            <div class="details"><ul>
+              <li>写作用于原型、验证、完善想法</li>
+              <li>功能常从 docs 甚至对话起步</li>
+              <li>用箭头描述 user flow：event → event → back</li>
+              <li>括号记号组织列表，结构即信息设计</li>
+              <li>自然语言应与代码、草图并列</li>
+            </ul></div>
+            <div class="ties"><span>↔ Design</span><span class="sec">↔ Analogy</span><span class="sec">↔ Functions</span><span class="ai-tie">↔ Prompt</span></div>
+          </div>
+
+          <div class="node" data-id="analogy" style="--c:#C99B3F;--d:.5s">
+            <h3><span class="emoji">💡</span> 类比思维 <span class="badge">原文</span></h3>
+            <div class="desc">Analogy，认知的核心</h3>
+            <div class="details"><ul>
+              <li>Hofstadter：类比是认知核心</li>
+              <li>让抽象变具体（Make the abstract concrete）</li>
+              <li>Snapchat = 「会消失的拍立得」</li>
+              <li>ELI5 / 「像在派对上解释」</li>
+              <li>去术语化 → 暴露思维漏洞</li>
+            </ul></div>
+            <div class="ties"><span>↔ Writing</span><span class="sec">↔ Primitives</span><span class="ai-tie">↔ Prompt</span></div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== 域 4：AI 延伸 ===== -->
+    <div class="domain" style="--c:#7B6BB5">
+      <div class="domain-head"><span class="bar"></span><h2>④ AI 延伸 <span class="cnt">2025–2026 · 6 节点</span></h2></div>
+      <div class="domain-note">把原文的「原型速度、写作即原型、工具链、后端进阶」放到 AI 语境下重写。虚线表示对应关系，非独立的第四条路径。</div>
+      <div class="grid-wrap">
+        <div class="grid" id="gridAI">
+
+          <div class="node ai-node" data-id="vibecoding" style="--c:#7B6BB5;--d:.55s">
+            <h3><span class="emoji">🎯</span> Vibe Coding <span class="badge badge-ai">AI</span></h3>
+            <div class="desc">自然语言 → 功能代码，角色转为描述意图</div>
+            <div class="details"><ul>
+              <li>Karpathy 2025 年提出</li>
+              <li>从「AI 补全」→「Agent 自主多文件变更」</li>
+              <li>核心循环：描述 → 生成 → review → 迭代</li>
+              <li>工具：Cursor, Claude Code, Copilot Agent Mode</li>
+              <li>需求清晰度 > 语法记忆</li>
+            </ul></div>
+            <div class="ties"><span>↔ Why</span><span>↔ HTML</span><span>↔ JS</span><span>→ Prompt</span><span>→ Agents</span><span>↔ Review</span></div>
+          </div>
+
+          <div class="node ai-node" data-id="prompt" style="--c:#7B6BB5;--d:.6s">
+            <h3><span class="emoji">📝</span> Prompt as Spec <span class="badge badge-ai">AI</span></h3>
+            <div class="desc">写需求文档 = 新的核心编程技能</div>
+            <div class="details"><ul>
+              <li>不再只写函数，而是写 PRD / specs.md</li>
+              <li>Agent 需要清晰上下文与边界条件</li>
+              <li>技巧：提供示例 > 描述规则</li>
+              <li>Plan Mode：先让 Agent 出计划，确认再执行</li>
+              <li>= Angert「写作即原型」的 AI 版验证</li>
+            </ul></div>
+            <div class="ties"><span>← Vibe</span><span>↔ Review</span><span>↔ Primitives</span><span>↔ Functions</span><span>↔ Writing</span><span>↔ Analogy</span></div>
+          </div>
+
+          <div class="node ai-node" data-id="agents" style="--c:#7B6BB5;--d:.65s">
+            <h3><span class="emoji">🤖</span> AI Coding Agents <span class="badge badge-ai">AI</span></h3>
+            <div class="desc">Cursor / Claude Code / v0，理解整个代码库</div>
+            <div class="details"><ul>
+              <li><strong>IDE 类</strong>：Cursor（Composer）、Windsurf（Cascade）</li>
+              <li><strong>CLI 类</strong>：Claude Code</li>
+              <li><strong>App Builder</strong>：v0、Bolt、Lovable、Replit Agent</li>
+              <li>能力：读整个代码库、规划、写文件、跑测试、自修复</li>
+            </ul></div>
+            <div class="ties"><span>← Vibe</span><span>↔ MCP</span><span>↔ Review</span><span>↔ Framework</span><span>↔ BaaS</span></div>
+          </div>
+
+          <div class="node ai-node" data-id="mcp" style="--c:#7B6BB5;--d:.7s">
+            <h3><span class="emoji">🔌</span> MCP & Context <span class="badge badge-ai">AI</span></h3>
+            <div class="desc">Model Context Protocol，AI 连接工具与数据</div>
+            <div class="details"><ul>
+              <li>MCP = Agent 的「USB 接口」</li>
+              <li><strong>GitHub MCP</strong>：自然语言管仓库</li>
+              <li><strong>Supabase MCP</strong>：用中文问数据库</li>
+              <li><strong>Browser / Vercel MCP</strong>：截图验证 UI</li>
+              <li>核心：上下文质量 > 模型聪明度</li>
+            </ul></div>
+            <div class="ties"><span>← Agents</span><span>↔ Backend</span><span>↔ Prompt</span><span>↔ BaaS</span></div>
+          </div>
+
+          <div class="node ai-node" data-id="review" style="--c:#7B6BB5;--d:.75s">
+            <h3><span class="emoji">🔍</span> AI Review & Debug <span class="badge badge-ai">AI</span></h3>
+            <div class="desc">审查 AI 代码 = 新的核心竞争力</div>
+            <div class="details"><ul>
+              <li>AI 擅长样板，弱于复杂业务 & 安全</li>
+              <li>「最后的 20%」仍需人类把关</li>
+              <li>调试成为主要摩擦点（不是写代码）</li>
+              <li>工具：Sentry, OpenTelemetry, Chrome DevTools MCP</li>
+              <li>JS/DOM 基础 → 让你判断 AI 对错</li>
+            </ul></div>
+            <div class="ties"><span>← Vibe</span><span>← Prompt</span><span>↔ JS</span><span>↔ Backend</span><span>↔ Functions</span></div>
+          </div>
+
+          <div class="node ai-node" data-id="baas" style="--c:#7B6BB5;--d:.8s">
+            <h3><span class="emoji">☁️</span> BaaS & Edge <span class="badge badge-ai">AI</span></h3>
+            <div class="desc">Supabase / Convex / Workers，后端托管化</div>
+            <div class="details"><ul>
+              <li>Agent 最爱的后端 = 写 schema 就自动建库</li>
+              <li><strong>Supabase</strong>：PostgreSQL + Auth + Storage</li>
+              <li><strong>Convex</strong>：实时数据库 + 函数</li>
+              <li><strong>Cloudflare Workers</strong>：边缘计算</li>
+              <li>数据建模思维依然不可替代</li>
+            </ul></div>
+            <div class="ties"><span>↔ Backend</span><span>↔ MCP</span><span>↔ Agents</span></div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <div class="empty-hint" id="hint">提示：点击卡片展开细节并高亮关联线 · 点击空白处退出</div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// solid=学习主干, dash=原文旁支, ai=AI放大
+const edges = [
+  // ===== Computing 主干（实线）=====
+  ['why','html','solid'],
+  ['html','js','solid'],
+  ['js','framework','solid'],
+  ['why','primitives','solid'],       // 原语贯穿全篇，作为概念主干
+  ['js','functions','solid'],         // 函数是 JS 理解的延伸
+  ['functions','backend','solid'],     // 函数/IO → 后端 API 设计
+  ['framework','backend','solid'],     // 框架 → 需后端支撑
+  // ===== Computing 旁支（橙色虚线）=====
+  ['js','viz','dash'],
+  ['framework','mcp','dash'],          // 框架部署依赖工具链 → MCP
+  ['html','mcp','dash'],               // HTML 静态站点部署 → MCP
+  ['js','backend','dash'],
+  ['framework','backend','dash'],
+  ['mcp','backend','dash'],            // 工具链连接后端
+  ['viz','design','dash'],            // 数据可视化 → 视觉设计
+  // ===== Core Concepts 旁支 =====
+  ['primitives','html','dash'],
+  ['primitives','js','dash'],
+  ['primitives','framework','dash'],
+  ['primitives','backend','dash'],
+  ['functions','js','dash'],
+  ['functions','backend','dash'],
+  // ===== Design & Writing 旁支 =====
+  ['design','writing','dash'],
+  ['writing','analogy','dash'],
+  ['analogy','primitives','dash'],     // 类比帮助理解原语
+  ['functions','writing','dash'],      // 输入输出 → 写作中的论证结构
+  // ===== AI 放大（紫色虚线）=====
+  ['why','vibecoding','ai'],
+  ['html','vibecoding','ai'],
+  ['js','vibecoding','ai'],
+  ['vibecoding','prompt','ai'],
+  ['vibecoding','agents','ai'],
+  ['prompt','review','ai'],
+  ['agents','review','ai'],
+  ['agents','mcp','ai'],
+  ['mcp','baas','ai'],
+  ['agents','mcp','ai'],               // Agent + MCP 重构工具链
+  ['mcp','backend','ai'],              // MCP 连接后端
+  ['baas','backend','ai'],             // BaaS 压缩后端门槛
+  ['prompt','primitives','ai'],        // Prompt = 用自然语言描述原语组合
+  ['review','js','ai'],                // Review 需要 JS 基础
+  ['review','backend','ai'],           // Review 需要后端知识
+  ['review','functions','ai'],         // Review = 验证函数正确性
+  ['prompt','functions','ai'],         // Prompt = 精确描述输入输出
+  ['prompt','writing','ai'],           // Prompt as Spec = 写作即原型
+  ['prompt','analogy','ai'],           // 好的 prompt 需要类比能力
+  ['vibecoding','design','ai'],        // Vibe Coding UI = 设计能力仍关键
+];
+
+// Editor's Take（上下文绑定的编辑解读）
+const takes = {
+  why:{ai:false,label:'Editor · 原文',body:'<strong>反直觉的起点。</strong>Angert 不下「该学什么」的结论，而是先让你押注平台本身：Web 可移植、跨端、工具生态庞大，且约 85% 项目可共用一个栈——<strong>复利来自重复押注，而非追逐新框架</strong>。WASM、协作应用是市场信号，不是入门前提。Unity/Flutter 各有优势，但便携性无出其右。'},
+  html:{ai:false,label:'Editor · 原文',body:'<strong>「低门槛，高天花板」的第一个实例。</strong>Markup/styling 思维是数字工具的通用语言（SwiftUI 同理），学费可迁移。SVG、CSS Animations 无需特殊工具即可试错——<strong>能直接在浏览器里 tinker，是 Web 最被低估的学习优势</strong>。'},
+  js:{ai:false,label:'Editor · 原文',body:'<strong>全章最重要的一站。</strong>Angert 坚持「先无库做原型」，核心是理解 DOM 与浏览器执行模型，而非记住 API。这判断在 AI 时代被强化：<strong>AI 能写代码，但判断对错的判断力来自这里的基础</strong>。推荐 <span style="color:var(--accent)">Just JavaScript</span>。'},
+  framework:{ai:false,label:'Editor · 原文',body:'<strong>「先理解原语，再拥抱抽象」的落点。</strong>React / Vue / Svelte 选一个深入，TypeScript 等基础扎实后再引入。框架是抽象不是捷径——<strong>抽象的价值在组合原语，代价是隐藏原语</strong>，顺序不能反。'},
+  backend:{ai:false,label:'Editor · 原文',body:'<strong>「进阶再说」的诚实标注。</strong>数据建模、REST / GraphQL、WebSocket / Webhook 深入必学，但「工具变化快」，先保前端基础。AI 时代 BaaS 压低起步门槛，<strong>却让数据建模与安全判断更值钱</strong>。'},
+  viz:{ai:false,label:'Editor · 原文',body:'<strong>作为「举例」出现的专题，不是独立阶段。</strong>D3.js 建立在 JS + SVG 之上，属「需要时再学」。放在这里是提醒：<strong>交互的审美与信息设计，是设计能力的一部分</strong>（通往域 ③）。'},
+  primitives:{ai:false,label:'Editor · 原文',body:'<strong>贯穿全篇的元能力。</strong>一切系统 = 原语 + 抽象：Lego 的砖→建筑、函数的输入→输出、音乐的音符→和弦。能拆解问题的人，既能设计好 API，也能写出好 prompt。<strong>这是 Angert 全篇最值得反复读的一段</strong>。'},
+  functions:{ai:false,label:'Editor · 原文',body:'<strong>把「过程」抽象为「变换」的通用思维。</strong>Blender: fruits → smoothie；分类器: 图片 → 是/否；File I/O、Unix pipes、Client/Server、REPL、Chatbot、搜索引擎——无一不是函数。核心训练：<strong>把目标建模为「输入 → 期望输出」</strong>。'},
+  design:{ai:false,label:'Editor · 原文',body:'<strong>不必是视觉大师，但要懂基础。</strong>现代 UI 设计基于图形 + 信息设计，而信息设计与写作同构（分段、留白、层级 = 句式变化）。绘图、图解、草图是 table-stakes；FigJam、BioRender、Keynote 验证了可视化工具的巨大市场。'},
+  writing:{ai:false,label:'Editor · 原文',body:'<strong>写作即原型，不是「写完再开发」。</strong>功能常从 docs 甚至对话起步，用箭头描述 user flow，括号记号组织列表——结构本身就是信息设计。Angert 的核心主张：<strong>自然语言应与代码、草图并列为主要创作媒介</strong>，最佳设计常发生在对话中。'},
+  analogy:{ai:false,label:'Editor · 原文',body:'<strong>类比 ≈ 认知本身（Hofstadter）。</strong>核心价值是让抽象变具体：Snapchat = 「会消失的拍立得」。ELI5 / 「像在派对上解释」逼你去术语化，<strong>暴露思维漏洞的同时让跨领域沟通成为可能</strong>——LLM 也可能在此帮我们做跨文化沟通。'},
+
+  vibecoding:{ai:true,label:'Editor · AI 延伸',body:'<strong>2025 年最显著的新变量。</strong>Karpathy 的 Vibe Coding 把角色从「写代码的人」变成「描述意图 + 审查结果的人」。它放大的是 Angert 最看重的能力——<strong>快速原型与交付速度</strong>，但「最后的 20%」（调试、判断）仍需你理解代码。需求清晰度 > 语法记忆。'},
+  prompt:{ai:true,label:'Editor · AI 延伸',body:'<strong>Angert「写作即原型」被 AI 直接验证。</strong>写 PRD / specs.md 替代写函数，提供示例优于描述规则，Plan Mode 先确认再执行。Prompt 质量的天花板 = 你拆解问题（原语与抽象、输入输出）的能力——<strong>这也是原文看似无关的段落突然变成「最核心技能」的原因</strong>。'},
+  agents:{ai:true,label:'Editor · AI 延伸',body:'<strong>Angert「工具链」的 2026 形态 = Agent + MCP。</strong>IDE 类（Cursor）、CLI 类（Claude Code）、App Builder（v0 / Bolt / Lovable）分工不同，选错类型比选错工具更常见。共同前提：<strong>你得能给 Agent 设定正确的架构约束</strong>——这又回到框架与系统思维。'},
+  mcp:{ai:true,label:'Editor · AI 延伸',body:'<strong>让 Agent 从「会聊」变成「能干」的接口层。</strong>GitHub / Supabase / Browser / Vercel MCP 把外部工具接入上下文。核心洞察：<strong>「上下文质量 > 模型聪明度」</strong>——给对上下文，本质上就是 Angert 说的「理解系统」。'},
+  review:{ai:true,label:'Editor · AI 延伸',body:'<strong>新的核心竞争力。</strong>AI 擅长样板，弱于复杂业务逻辑与安全，「最后的 20%」仍需人类把关，调试反而成了主要摩擦点。这里原文的所有基础（JS、DOM、后端、函数思维）<strong>从「用来写」变成「用来审」</strong>——价值不降反升。'},
+  baas:{ai:true,label:'Editor · AI 延伸',body:'<strong>「后端进阶」被压缩，但没被消灭。</strong>Supabase、Convex、Cloudflare Workers 让 Agent 写个 schema 就起后端；可数据建模、权限、性能这些原文强调的思维，<strong>一旦涉及真实用户，依然只能由人来定</strong>。'},
+};
+
+const stage = document.getElementById('stage');
+const svg = document.getElementById('svg');
+const grids = ['gridCompute','gridConcepts','gridDesign','gridAI'];
+const nodes = [];
+grids.forEach(id => {
+  const el = document.getElementById(id);
+  if (el) nodes.push(...el.querySelectorAll('.node'));
+});
+const map = {};
+nodes.forEach(n => map[n.dataset.id] = n);
+
+function draw(){
+  const sb = stage.getBoundingClientRect();
+  svg.setAttribute('viewBox', `0 0 ${sb.width} ${sb.height}`);
+  svg.innerHTML = '';
+  edges.forEach(([a,b,type])=>{
+    const na=map[a], nb=map[b]; if(!na||!nb) return;
+    const ra=na.getBoundingClientRect(), rb=nb.getBoundingClientRect();
+    const x1=ra.left-sb.left+ra.width/2, y1=ra.top-sb.top+ra.height/2;
+    const x2=rb.left-sb.left+rb.width/2, y2=rb.top-sb.top+rb.height/2;
+    const line=document.createElementNS('http://www.w3.org/2000/svg','line');
+    line.setAttribute('x1',x1); line.setAttribute('y1',y1);
+    line.setAttribute('x2',x2); line.setAttribute('y2',y2);
+    line.setAttribute('class', type==='solid'?'edge-solid':type==='dash'?'edge-dash':'edge-ai');
+    line.dataset.a=a; line.dataset.b=b;
+    svg.appendChild(line);
+  });
+}
+
+let active=null;
+const hint=document.getElementById('hint');
+const toast=document.getElementById('toast');
+const panel=document.getElementById('panel');
+const panelLabel=document.getElementById('panelLabel');
+const panelBody=document.getElementById('panelBody');
+const connected=(a,b)=>edges.some(([x,y])=>(x===a&&y===b)||(x===b&&y===a));
+
+function clearFocus(){
+  active=null;
+  stage.classList.remove('focus');
+  nodes.forEach(n=>n.classList.remove('active','dim'));
+  svg.querySelectorAll('line').forEach(l=>l.classList.remove('hot'));
+  hint.classList.remove('show');
+}
+
+function showToast(msg){
+  toast.textContent=msg;
+  toast.classList.add('show');
+  clearTimeout(toast._t);
+  toast._t=setTimeout(()=>toast.classList.remove('show'),3500);
+}
+
+function showPanel(id){
+  const t=takes[id];
+  if(!t){panel.classList.remove('open');return;}
+  panel.classList.toggle('ai',t.ai);
+  panelLabel.textContent=t.label;
+  panelBody.innerHTML=t.body;
+  panel.classList.add('open');
+  requestAnimationFrame(()=>panel.scrollIntoView({behavior:'smooth',block:'nearest'}));
+}
+
+nodes.forEach(n=>{
+  n.addEventListener('click',e=>{
+    e.stopPropagation();
+    const id=n.dataset.id;
+    if(active===id){clearFocus();return;}
+    active=id; stage.classList.add('focus'); hint.classList.add('show');
+    nodes.forEach(x=>{
+      x.classList.toggle('active',x.dataset.id===id);
+      x.classList.toggle('dim',x.dataset.id!==id && !connected(id,x.dataset.id));
+    });
+    svg.querySelectorAll('line').forEach(l=>{
+      l.classList.toggle('hot', l.dataset.a===id||l.dataset.b===id);
+    });
+    showPanel(id);
+  });
+});
+
+document.addEventListener('click',e=>{ if(!e.target.closest('.node')) clearFocus(); });
+document.addEventListener('keydown',e=>{ if(e.key==='Escape') clearFocus(); });
+
+document.getElementById('dashToggle').addEventListener('click',function(){
+  this.classList.toggle('on');
+  stage.classList.toggle('show-dash');
+  if(this.classList.contains('on')){
+    this.textContent='🙈 隐藏旁支';
+    showToast('橙色虚线 = 原文内的旁支与跨域关联');
+  } else {
+    this.textContent='🔗 显示旁支（橙色）';
+  }
+});
+
+document.getElementById('aiToggle').addEventListener('click',function(){
+  this.classList.toggle('on');
+  stage.classList.toggle('show-ai');
+  if(this.classList.contains('on')){
+    this.textContent='🙈 隐藏 AI 连线';
+    showToast('紫色虚线 = AI 节点如何放大 / 对应原文节点');
+  } else {
+    this.textContent='🤖 显示 AI 连线（紫色）';
+  }
+});
+
+document.getElementById('resetBtn').addEventListener('click',()=>{
+  clearFocus();
+  panel.classList.remove('open');
+  stage.classList.remove('show-dash','show-ai');
+  const d=document.getElementById('dashToggle');
+  const a=document.getElementById('aiToggle');
+  d.classList.remove('on'); d.textContent='🔗 显示旁支（橙色）';
+  a.classList.remove('on'); a.textContent='🤖 显示 AI 连线（紫色）';
+});
+
+window.addEventListener('resize',draw);
+draw();
+</script>
+</body>
+</html>
