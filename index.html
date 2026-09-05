@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="zh">
+<html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>kk7i · AI 探索作品集</title>
+  <title>kk7i · AI Exploration Portfolio</title>
   <style>
     :root { --fg:#1a1a1a; --muted:#888; --line:#e3e3e3; --accent:#2f6fed; }
     body { font-family: system-ui, -apple-system, "PingFang SC", "Microsoft YaHei", sans-serif;
@@ -16,7 +16,7 @@
             color: inherit; transition: .15s ease; }
     .card:hover { border-color: var(--accent); transform: translateX(4px); }
     .card .date { color: var(--muted); font-size: .82rem; }
-    .card p { margin: .35rem 0 0; }
+    .card p, .card .desc { margin: .35rem 0 0; }
     footer { margin-top: 3rem; padding-top: 1rem; border-top: 1px solid var(--line);
              color: var(--muted); font-size: .85rem; }
     footer a { color: var(--accent); text-decoration: none; }
@@ -24,22 +24,22 @@
 </head>
 <body>
   <header>
-    <h1>kk7i · AI 探索作品集</h1>
-    <p class="subtitle">用费曼学习法，把每个模糊问题做到能教给别人 —— 文章深挖 / 交互式 HTML / 可复用 SOP</p>
+    <h1>kk7i · AI Exploration Portfolio</h1>
+    <p class="subtitle">Using the Feynman technique to turn vague questions into useful explanations, interactive HTML, and reusable SOPs.</p>
   </header>
 
   <main>
   <!-- WORKS-LIST -->
   <a class="card" href="works/voice-ai-hacks/">
     <span class="date">2026-09-05</span><br>
-    <strong>🎙️ 语音 × AI 协作 Hacks</strong>
-    <p>六层框架拆解语音 AI 工作流：触发 → 听写 → 清洗 → 路由 → 编排 → 反馈。</p>
+    <span class="title">🎙️ 语音 × AI 协作 Hacks</span>
+    <div class="desc">从语音输入到语音 Agent：拆解六层协作工作流，并比较 Pipecat、LiveKit 与 TEN。</div>
   </a>
   <!-- /WORKS-LIST -->
   </main>
 
   <footer>
-    由 <a href="https://github.com/kk7i">@kk7i</a> 维护 · 源码见 GitHub · 每个作品对应一个 Issue 作为费曼学习日志
+    Maintained by <a href="https://github.com/kk7i">@kk7i</a> · Source on GitHub · Each work has a corresponding Issue as a Feynman learning log
   </footer>
 </body>
 </html>

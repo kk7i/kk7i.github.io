@@ -510,20 +510,6 @@
       <div class="row"><div class="scene">做语音产品 / Agent</div><div class="combo">Pipecat / LiveKit Agents / TEN Framework</div></div>
     </section>
 
-    <!-- 11 探索路径 checklist -->
-    <section class="card">
-      <h2><span class="num">11</span><span class="t">你的探索路径</span></h2>
-      <p class="muted">按此顺序玩，性价比最高。可勾选追踪进度 👇</p>
-      <div class="progress-wrap" id="checklist">
-        <div class="step"><span class="check">✓</span><span class="txt">本周：把豆包 + Hammerspoon（输入法恢复）+ 手动 Enter 跑顺</span></div>
-        <div class="step"><span class="check">✓</span><span class="txt">下周：试用 Wispr Flow 免费档，感受 AI 润色听写的差异</span></div>
-        <div class="step"><span class="check">✓</span><span class="txt">月底：装 VoiceInk，体验本地 Whisper + Context Aware 给 Cursor 口述</span></div>
-        <div class="step"><span class="check">✓</span><span class="txt">进阶：玩 Karabiner 三段式规则，做到「口述→检查→发送」全流程键盘化</span></div>
-        <div class="step"><span class="check">✓</span><span class="txt">反馈层：尝试让 AI 回复后自动激活麦克风，体验「对话循环」</span></div>
-        <div class="step"><span class="check">✓</span><span class="txt">终极：若现有工具都不够爽，用 Pipecat 自建专属语音 Agent</span></div>
-      </div>
-    </section>
-
   </div>
 
   <footer>
@@ -606,15 +592,7 @@
     }
   }
 
-  // ---- 4. 探索路径可勾选 checklist ----
-  var checks = document.querySelectorAll('.check');
-  for(var k=0;k<checks.length;k++){
-    checks[k].addEventListener('click', function(){
-      this.classList.toggle('done');
-    });
-  }
-
-  // ---- 5. 回到顶部按钮 ----
+  // ---- 4. Back-to-top button ----
   var backTop = document.getElementById('backTop');
   window.addEventListener('scroll', function(){
     if(window.scrollY > 400){ backTop.classList.add('show'); }
