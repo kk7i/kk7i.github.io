@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>The Tech Trek · Hiring Engineers in the AI Era</title>
+<style>
+  :root{
+    --bg:#F5F0EB; --card:#FDFAF6; --ink:#3D3A36; --muted:#8A8178;
+    --accent:#5CB88A; --accent-soft:rgba(92,184,138,.10);
+    --ai:#7B6BB5; --ai-soft:rgba(123,107,181,.08);
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:var(--bg);color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Hiragino Sans GB","Helvetica Neue",sans-serif;line-height:1.7;font-size:14px}
+  ::selection{background:var(--accent);color:#fff}
+
+  .page{max-width:920px;margin:0 auto;padding:0 24px 80px}
+
+  /* ── header ── */
+  header{padding:52px 0 0}
+  .kicker{font-size:11px;letter-spacing:2px;color:var(--accent);font-weight:600;text-transform:uppercase;margin-bottom:10px}
+  h1{font-size:24px;font-weight:700;letter-spacing:-0.4px;line-height:1.35;margin-bottom:6px}
+  .subtitle{font-size:13px;color:var(--muted);margin-bottom:4px}
+  .meta{font-size:12px;color:var(--muted);margin-bottom:24px}
+  .meta a{color:var(--accent);text-decoration:none;border-bottom:1px solid currentColor}
+
+  /* ── brief block ── */
+  .brief{background:var(--card);border-radius:12px;padding:18px 20px;margin-bottom:14px;
+    border-left:4px solid var(--accent);box-shadow:0 1px 3px rgba(0,0,0,.04)}
+  .brief.ai{border-left-color:var(--ai);background:var(--ai-soft)}
+  .brief-label{font-size:11px;font-weight:600;color:var(--accent);letter-spacing:1.2px;text-transform:uppercase;margin-bottom:6px}
+  .brief.ai .brief-label{color:var(--ai)}
+  .brief p{font-size:14px;line-height:1.8;margin-bottom:8px}
+  .brief p:last-child{margin-bottom:0}
+  .brief strong{font-weight:600}
+  .hook{display:block;margin-top:10px;padding:9px 13px;background:var(--accent-soft);
+    border-radius:7px;font-size:13px;border-left:3px solid var(--accent)}
+  .brief.ai .hook{background:var(--ai-soft);border-left-color:var(--ai)}
+
+  /* ── section headings ── */
+  .section-title{font-size:13px;font-weight:600;color:var(--muted);letter-spacing:1px;
+    text-transform:uppercase;margin:34px 0 14px;padding-bottom:8px;border-bottom:1px solid rgba(0,0,0,.06)}
+  .section-title .num{color:var(--accent);margin-right:6px}
+  .section-title.ai .num{color:var(--ai)}
+
+  /* ── cards ── */
+  .cards{display:flex;flex-direction:column;gap:12px}
+  .card{background:var(--card);border-radius:12px;padding:14px 16px 14px 18px;
+    box-shadow:0 1px 3px rgba(0,0,0,.04);transition:box-shadow .25s,transform .25s;
+    border-left:4px solid var(--c,#ccc);opacity:0;animation:fadeUp .45s forwards;animation-delay:var(--d,0s)}
+  @keyframes fadeUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+  .card:hover{box-shadow:0 5px 16px rgba(0,0,0,.07);transform:translateY(-2px)}
+  .card.ai{background:var(--ai-soft)}
+  .card .head{display:flex;align-items:center;gap:8px;margin-bottom:3px}
+  .card .time{font-size:11px;font-weight:600;color:var(--accent);background:var(--accent-soft);
+    padding:1px 7px;border-radius:4px;flex-shrink:0}
+  .card.ai .time{color:var(--ai);background:rgba(123,107,181,.10)}
+  .card h3{font-size:15px;font-weight:600;line-height:1.4}
+  .card .desc{font-size:12.5px;color:var(--muted);line-height:1.55;margin-top:2px}
+  .card .body{font-size:13.5px;line-height:1.75;max-height:0;overflow:hidden;transition:max-height .35s ease,margin .25s}
+  .card.open .body{max-height:600px;margin-top:10px;padding-top:10px;border-top:1px dashed rgba(0,0,0,.08)}
+  .card .body ul{margin:0;padding-left:18px}
+  .card .body li{margin-bottom:4px}
+  .card .quote{font-style:italic;font-size:13px;color:var(--ink);padding:8px 12px;
+    background:rgba(0,0,0,.03);border-radius:6px;margin:8px 0;line-height:1.6}
+  .card .source-tag{font-size:11px;color:var(--ai);background:rgba(123,107,181,.08);
+    padding:1px 8px;border-radius:999px;display:inline-block;margin-top:6px}
+
+  @media(max-width:640px){
+    .page{padding:0 16px 60px}
+    header{padding-top:32px}
+    h1{font-size:21px}
+    .brief{padding:15px 16px}
+    .brief p,.card .body{font-size:13px}
+    .hook{font-size:12px}
+  }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <!-- ──────────────── HEADER ──────────────── -->
+  <header>
+    <div class="kicker">The Tech Trek · Episode 07</div>
+    <h1>How Do You Hire Engineers When AI Writes the Code?</h1>
+    <div class="subtitle">嘉宾 <strong>Raymond Wang</strong> · CTO & 联合创始人 · Ease Health · 主持人 Amir</div>
+    <div class="meta">时长 28 min · 2026-08-07 · <a href="https://podimo.com/en/shows/the-tech-trek/episode/20e4ad18-0567-523f-9bd5-5157fd09666b" target="_blank">原链接</a></div>
+
+    <div class="brief">
+      <div class="brief-label">Editor's Brief · 节目主线</div>
+      <p>这期节目表面在谈「招聘」，实际在回答一个更深的问题：<strong>当 AI 能写代码，软件工程的价值链到底在哪里？</strong> Raymond 从 Ease Health 的实践出发，论证了一条完整的逻辑链——</p>
+      <p>首先，<strong>招聘标准必须重排</strong>：语法和语言熟悉度的重要性下降，取而代之的是产品直觉、工程判断力、热情与驱动力。核心论据是「AI 生成代码的门槛趋近于零，但<strong>判断生成结果对不对</strong>的门槛没有下降」。这引出一个面试设计的难题：观察候选人 prompt 的过程引入了主观性，因为不同 prompting 风格可能产生同等优秀的结果。</p>
+      <p>接着他推导出两个实践落点：<strong>Code Review 是 AI 最强的工程用例</strong>（因为「验证他人产出」正是人类的核心竞争力），以及<strong>Token 经济学</strong>——用最强模型处理高风险决策（如 code review），用便宜模型处理低风险内部任务，本质是 ROI 思维。</p>
+      <p>最后收束到<strong>角色分化</strong>：未来软件工程可能分裂为精英通才、较窄角色和高度专业化专家三层。贯穿全程的金句是：<em>"Evaluate the output more than the subjective input."</em></p>
+      <span class="hook">💡 阅读说明：纵向三段即节目叙事顺序（招聘 → 工程实践 → 未来图景）；「元能力」与「外部验证」作为旁注穿插呼应。点击任意卡片展开完整内容。</span>
+    </div>
+
+    <div class="brief ai">
+      <div class="brief-label">Editor's Brief · 外部交叉验证</div>
+      <p>节目播出后，多个独立来源从不同角度验证了 Raymond 的论点，也补充了他的盲点。它们不是「延伸模块」，而是<strong>嵌入到对应论点旁边的证据层</strong>——可以理解为「另一位专家在同一页上的旁注」。</p>
+      <p>YC 的数据和 Gartner 警告共同构成一组张力：<strong>ROI 确实存在，但「Agent 失控」是真实风险</strong>。Value Stack 框架把 Raymond 散落的直觉（分解→验证→架构）系统化。Addy Osmani 的总结提供了「角色分化」的行业级佐证。Model Routing 是 Token 经济学的工程化落地。而<strong>领域知识</strong>这条线，则由 Ease Health 自身的商业模式（行为健康垂直 SaaS）无声地背书。</p>
+    </div>
+  </header>
+
+  <!-- ──────────────── MAIN FLOW ──────────────── -->
+  <div class="cards" id="cards">
+
+    <!-- ═══════════════════════════════════════════
+         ACT I — 招聘标准重构
+         ═══════════════════════════════════════════ -->
+    <div class="section-title"><span class="num">Ⅰ</span> 招聘标准：什么变了，什么没变</div>
+
+    <div class="card" data-id="hiring" style="--c:#E8A75D;--d:0s">
+      <div class="head"><span class="time">02:05</span><h3>招聘权重重排</h3></div>
+      <div class="desc">语法知识不再稀缺，产品直觉与工程判断力成为核心信号</div>
+      <div class="body"><ul>
+        <li>语法 & 特定语言熟悉度 → 重要性显著下降</li>
+        <li>产品直觉（product instincts）：能否从用户视角思考？</li>
+        <li>工程判断力（engineering judgment）：面对模糊问题时能否做出合理取舍？</li>
+        <li>热情与驱动力（passion & drive）：依然是不可替代的筛选信号</li>
+        <li>核心能力：<strong>拆解问题 + 引导跑偏的 Agent 回到正轨</strong></li>
+      </ul>
+      <div class="quote">"We weigh a lot more on product instincts, engineering instincts, and the ability to break down problems."</div></div>
+    </div>
+
+    <div class="card" data-id="interview" style="--c:#6B9BD2;--d:.05s">
+      <div class="head"><span class="time">05:30</span><h3>面试设计困境</h3></div>
+      <div class="desc">观察候选人 prompt 引入了主观性——不同风格可能产出同等好结果</div>
+      <div class="body"><ul>
+        <li>传统面试假设「过程可见 = 能力可评估」</li>
+        <li>但 prompting 风格高度个人化，风格 ≠ 质量</li>
+        <li>核心矛盾：<strong>评价「输入」天然主观，评价「输出」更客观</strong></li>
+        <li>解法：让面试贴近真实工作，评估最终产出的质量</li>
+      </ul>
+      <div class="quote">"Different prompting styles can produce equally strong results."</div></div>
+    </div>
+
+    <div class="card" data-id="models" style="--c:#A87FD6;--d:.1s">
+      <div class="head"><span class="time">08:40</span><h3>编码面试 vs 模型进化</h3></div>
+      <div class="desc">当模型能力每月跃迁，静态面试题的半衰期趋近于零</div>
+      <div class="body"><ul>
+        <li>传统算法题 → 模型轻松通过 → 区分度消失</li>
+        <li>「不要用 AI」的面试 = 考察一个已经不存在的工作方式</li>
+        <li>方向：考察「如何用 AI 解决问题」而非「能否不用 AI」</li>
+      </ul></div>
+    </div>
+
+    <!-- ═══════════════════════════════════════════
+         ACT II — 工程实践
+         ═══════════════════════════════════════════ -->
+    <div class="section-title"><span class="num">Ⅱ</span> 工程实践：AI 改变了哪里</div>
+
+    <div class="card" data-id="review" style="--c:#5CB88A;--d:.15s">
+      <div class="head"><span class="time">12:10</span><h3>Code Review 是最强用例</h3></div>
+      <div class="desc">AI 擅长生成，人类擅长验证——review 恰好是验证的极致形态</div>
+      <div class="body"><ul>
+        <li>Agent 生成代码 → 需要有人审查 → <strong>这个「有人」就是工程师的新核心</strong></li>
+        <li>Ease Health 已在跑 background agents 做 code review</li>
+        <li>类比：医生不看 AI 的诊断报告就签字 = 不可接受</li>
+        <li>深层含义：<strong>「理解代码」比「写代码」更重要</strong></li>
+      </ul>
+      <div class="quote">"Use the strongest models for expensive mistakes, such as code review."</div></div>
+    </div>
+
+    <div class="card" data-id="tokens" style="--c:#D66B6B;--d:.2s">
+      <div class="head"><span class="time">14:40</span><h3>Token 经济学</h3></div>
+      <div class="desc">把 token 支出与工程产出对比——这是 ROI 思维，不是成本削减</div>
+      <div class="body"><ul>
+        <li>关键问题：<strong>每个 token 花出去，换来了多少工程价值？</strong></li>
+        <li>策略：强模型 → 高风险决策（review、架构）；便宜模型 → 低风险内部任务</li>
+        <li>隐含前提：模型路由（model routing）是工程能力，不是财务问题</li>
+        <li>Ease Health 自建 harness → 统一观测 token 消耗与产出质量</li>
+      </ul></div>
+    </div>
+
+    <div class="card" data-id="harness" style="--c:#8A8178;--d:.25s">
+      <div class="head"><span class="time">贯穿</span><h3>Internal AI Harness</h3></div>
+      <div class="desc">不是用现成工具，而是把 AI 编织进日常工作流的「缰绳」</div>
+      <div class="body"><ul>
+        <li>背景 agents + code review agents + 统一工具链</li>
+        <li>工程师既是使用者也是改进者 → <strong>harness 本身是被工程师持续优化的产品</strong></li>
+        <li>这是「工具链」在 agentic 时代的新形态</li>
+      </ul>
+      <div class="quote">"Build an internal AI harness that engineers use and improve as part of their daily workflow."</div></div>
+    </div>
+
+    <!-- ═══════════════════════════════════════════
+         ACT III — 未来图景
+         ═══════════════════════════════════════════ -->
+    <div class="section-title"><span class="num">Ⅲ</span> 未来图景：角色如何分化</div>
+
+    <div class="card" data-id="future" style="--c:#3D3A36;--d:.3s">
+      <div class="head"><span class="time">26:45</span><h3>角色分化</h3></div>
+      <div class="desc">软件工程可能分裂为精英通才、较窄角色、高度专业化专家</div>
+      <div class="body"><ul>
+        <li><strong>精英通才</strong>：端到端交付，AI 放大个人产出至团队级别</li>
+        <li><strong>较窄角色</strong>：深耕某一层（如 infra、security），AI 辅助但不替代</li>
+        <li><strong>高度专业化专家</strong>：领域知识 + AI 工具 = 不可替代的组合</li>
+        <li>共同点：<strong>「只会写代码」这一层被压缩</strong></li>
+      </ul>
+      <div class="quote">"Software engineering may split between elite generalists, narrower roles, and highly specialized experts."</div></div>
+    </div>
+
+    <!-- ═══════════════════════════════════════════
+         元能力（暗线）
+         ═══════════════════════════════════════════ -->
+    <div class="section-title"><span class="num">◆</span> 贯穿全期的元能力（暗线）</div>
+
+    <div class="card" data-id="judgment" style="--c:#5CB88A;--d:.35s">
+      <div class="head"><h3>判断力（Engineering Judgment）</h3></div>
+      <div class="desc">整期节目的最高频词——它不写代码，但决定代码对不对</div>
+      <div class="body"><ul>
+        <li>贯穿：招聘 → 面试 → review → token 决策 → 角色分化</li>
+        <li>本质：<strong>在不确定性中做出合理取舍的能力</strong></li>
+        <li>AI 放大它：判断力越强 → AI 产出越好；判断力越弱 → AI 放大错误</li>
+      </ul></div>
+    </div>
+
+    <div class="card" data-id="decomposition" style="--c:#E8A75D;--d:.4s">
+      <div class="head"><h3>问题拆解（Problem Decomposition）</h3></div>
+      <div class="desc">Raymond 反复强调的核心能力——把模糊需求变为 AI 可执行的规格</div>
+      <div class="body"><ul>
+        <li>「Break down problems methodically」出现于 02:22</li>
+        <li>拆解质量直接决定 AI 输出质量 → <strong>这是新时代的「写代码」</strong></li>
+        <li>对应架构师角色：不是写实现，而是定义接口与边界</li>
+      </ul></div>
+    </div>
+
+    <div class="card" data-id="steering" style="--c:#A87FD6;--d:.45s">
+      <div class="head"><h3>Agent Steering（引导跑偏的 Agent）</h3></div>
+      <div class="desc">Raymond 的原话——当 AI 走错方向时，你能察觉并纠正</div>
+      <div class="body"><ul>
+        <li>原文："the ability to break down problems and guide AI agents when they go in the wrong direction"</li>
+        <li>这是「判断力」的动态版本：不只是评估，而是<strong>实时纠偏</strong></li>
+        <li>对应 harness 的迭代改进：工程师不断调整 agent 行为</li>
+      </ul></div>
+    </div>
+
+    <div class="card" data-id="verification" style="--c:#D66B6B;--d:.5s">
+      <div class="head"><h3>验证闭环（Verify &amp; Take Ownership）</h3></div>
+      <div class="desc">从 code review 延伸到整个工程文化的核心动作</div>
+      <div class="body"><ul>
+        <li>AI 生成的每一行 → 必须有人验证 → 验证者承担所有权</li>
+        <li>Karpathy 的 "generation-verification loop" 概念</li>
+        <li><strong>「理解代码」是验证的前提 → 基础能力反而更重要</strong></li>
+      </ul></div>
+    </div>
+
+    <!-- ═══════════════════════════════════════════
+         外部验证（旁注层）
+         ═══════════════════════════════════════════ -->
+    <div class="section-title ai"><span class="num">+</span> 外部交叉验证（旁注层）</div>
+
+    <div class="card ai" data-id="yc" style="--c:#7B6BB5;--d:.55s">
+      <div class="head"><span class="time">2025</span><h3>YC 数据：AI 加速的真实上限</h3></div>
+      <div class="desc">Y Combinator 批次数据显示 10x+ 速度提升，但天花板清晰</div>
+      <div class="body"><ul>
+        <li>2025 批次中大量 startup 用 AI agents 实现 10x 工程速度</li>
+        <li>但「最后一公里」仍需人类：集成、调试、生产化</li>
+        <li><strong>验证了 Raymond 的「判断力」论点：速度不是瓶颈，判断是</strong></li>
+      </ul>
+      <span class="source-tag">来源：Y Combinator</span></div>
+    </div>
+
+    <div class="card ai" data-id="gartner" style="--c:#7B6BB5;--d:.6s">
+      <div class="head"><span class="time">2025</span><h3>Gartner 警告：Agent 失控风险</h3></div>
+      <div class="desc">对 Raymond 乐观叙事的必要制衡</div>
+      <div class="body"><ul>
+        <li>预测：到 2028 年 33% 的企业软件将包含 agentic AI</li>
+        <li>但 "agent sprawl"（智能体蔓延）是真实风险</li>
+        <li><strong>反向验证了「Agent Steering」的必要性</strong></li>
+      </ul>
+      <span class="source-tag">来源：Gartner</span></div>
+    </div>
+
+    <div class="card ai" data-id="value-stack" style="--c:#7B6BB5;--d:.65s">
+      <div class="head"><span class="time">框架</span><h3>Value Stack：价值栈</h3></div>
+      <div class="desc">把 Raymond 散落的直觉系统化为三层模型</div>
+      <div class="body"><ul>
+        <li><strong>Layer 1</strong>：Problem Decomposition &amp; Specification（= 拆解）</li>
+        <li><strong>Layer 2</strong>：Rigorous Verification &amp; Validation（= review + 验证）</li>
+        <li><strong>Layer 3</strong>：System Architecture &amp; Integration（= harness + 架构）</li>
+        <li>精确对应节目主线 → <strong>这不是新框架，而是 Raymond 论点的结构化表达</strong></li>
+      </ul>
+      <span class="source-tag">来源：unvritt.com</span></div>
+    </div>
+
+    <div class="card ai" data-id="osmani" style="--c:#7B6BB5;--d:.7s">
+      <div class="head"><span class="time">2026</span><h3>Addy Osmani：行业级佐证</h3></div>
+      <div class="desc">Google Cloud AI 工程总监的两年预测，与 Raymond 高度共振</div>
+      <div class="body"><ul>
+        <li>核心观点：<strong>AI 不会消灭程序员，但会淘汰「只会写代码的 coder」</strong></li>
+        <li>初级门槛提高：新人须能用 AI 交付整个团队的产出</li>
+        <li>T 型人才更值钱：一技之深 + AI 赋能的广度</li>
+        <li><strong>直接验证了 26:45 的角色分化预言</strong></li>
+      </ul>
+      <span class="source-tag">来源：Addy Osmani / LinkedIn</span></div>
+    </div>
+
+    <div class="card ai" data-id="routing" style="--c:#7B6BB5;--d:.75s">
+      <div class="head"><span class="time">工程化</span><h3>Model Routing：模型路由</h3></div>
+      <div class="desc">Raymond "强模型用于高风险" 的直觉 → 已被工程化为标准实践</div>
+      <div class="body"><ul>
+        <li>原则：强模型做规划 &amp; review，快模型做执行 &amp; 批量任务</li>
+        <li>Planner-Executor 分离：可控性强，强模型规划 + 确定性校验</li>
+        <li><strong>这正是 Raymond 14:40 的 token 经济学的工程落地</strong></li>
+      </ul>
+      <span class="source-tag">来源：腾讯云 / 2026 面试题汇总</span></div>
+    </div>
+
+    <div class="card ai" data-id="domain" style="--c:#7B6BB5;--d:.8s">
+      <div class="head"><span class="time">案例</span><h3>领域知识（Ease Health 自身）</h3></div>
+      <div class="desc">Ease Health 的商业模式本身就是对「领域知识不可替代」的沉默证明</div>
+      <div class="body"><ul>
+        <li>Ease Health：行为健康领域的 AI-native 操作系统</li>
+        <li>统一 CRM + EHR + RCM → 需要深度理解医疗报销逻辑、临床工作流</li>
+        <li>a16z $41M Series A → 投的不是「会写代码」，而是<strong>「懂这个行业的团队 + AI」</strong></li>
+        <li><strong>领域知识是「判断力」在具体行业中的具象化</strong></li>
+      </ul>
+      <span class="source-tag">来源：a16z / VentureBeat / Ease Health 招聘</span></div>
+    </div>
+
+  </div><!-- /cards -->
+
+</div><!-- /page -->
+
+<script>
+/* 卡片展开/收起（纯局部交互，无连线、无 focus 高亮） */
+const cards = document.querySelectorAll('.card');
+cards.forEach(c => {
+  c.addEventListener('click', () => {
+    const wasOpen = c.classList.contains('open');
+    cards.forEach(x => x.classList.remove('open'));
+    if (!wasOpen) c.classList.add('open');
+  });
+});
+</script>
+</body>
+</html>
