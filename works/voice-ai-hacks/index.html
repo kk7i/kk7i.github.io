@@ -1,0 +1,630 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>语音 × AI 协作 Hacks</title>
+<style>
+  :root{
+    --bg:#f4f7f5;
+    --card:#ffffff;
+    --ink:#2f3b38;
+    --sub:#6b7c77;
+    --line:#e8eee9;
+    --accent:#7bb98a;   /* fomo-ish green */
+    --accent2:#f4c95d;  /* warm yellow */
+    --accent3:#e99a8c;  /* coral */
+    --accent4:#8fb8de;  /* blue */
+    --shadow:0 4px 18px rgba(120,140,130,0.10);
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{
+    font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei",sans-serif;
+    background:var(--bg);
+    color:var(--ink);
+    line-height:1.75;
+    -webkit-font-smoothing:antialiased;
+  }
+  .wrap{max-width:760px;margin:0 auto;padding:48px 20px 120px;}
+
+  header.hero{
+    text-align:center;
+    padding:36px 20px;
+    background:linear-gradient(160deg,#eef7f0,#fbf6ec);
+    border-radius:24px;
+    margin-bottom:40px;
+    box-shadow:var(--shadow);
+  }
+  .hero .badge{
+    display:inline-block;
+    font-size:13px;
+    color:#4a7a58;
+    background:#e3f1e7;
+    padding:5px 14px;
+    border-radius:20px;
+    margin-bottom:16px;
+    font-weight:600;
+  }
+  .hero h1{font-size:32px;font-weight:800;letter-spacing:-0.5px;}
+  .hero h1 .dot{color:var(--accent3);}
+  .hero p{color:var(--sub);margin-top:14px;font-size:15px;}
+
+  .stack{display:flex;flex-direction:column;gap:22px;}
+
+  .card{
+    background:var(--card);
+    border-radius:20px;
+    padding:26px 28px;
+    box-shadow:var(--shadow);
+    border:1px solid var(--line);
+    transition:transform .25s ease, box-shadow .25s ease;
+  }
+  .card:hover{transform:translateY(-3px);box-shadow:0 10px 28px rgba(120,140,130,0.16);}
+
+  .card h2{
+    font-size:20px;
+    display:flex;align-items:center;gap:10px;
+    margin-bottom:14px;
+  }
+  .num{
+    flex:none;
+    width:34px;height:34px;border-radius:11px;
+    display:grid;place-items:center;
+    font-size:15px;font-weight:800;color:#fff;
+    background:var(--accent);
+  }
+  .card h2 .t{font-weight:800;}
+
+  p{font-size:15px;color:var(--ink);}
+  .muted{color:var(--sub);font-size:13.5px;}
+
+  ul{padding-left:20px;margin:10px 0;}
+  li{margin:6px 0;font-size:14.5px;}
+  li::marker{color:var(--accent);}
+
+  .layers{display:flex;flex-direction:column;gap:2px;margin-top:8px;}
+  .layer{
+    display:flex;align-items:center;gap:14px;
+    padding:13px 16px;
+    background:#f8faf8;
+    border-left:4px solid var(--accent);
+    font-size:14px;
+    cursor:pointer;
+    transition:background .2s;
+  }
+  .layer:hover{background:#eef5f0;}
+  .layer b{color:#4a7a58;}
+  .layer .desc{color:var(--sub);font-size:12.5px;margin-top:2px;}
+
+  table{width:100%;border-collapse:collapse;margin-top:10px;font-size:13.5px;}
+  th,td{border:1px solid var(--line);padding:9px 11px;text-align:left;vertical-align:top;}
+  th{background:#eef5f0;color:#4a7a58;font-weight:700;}
+  tr:hover td{background:#f8faf8;}
+
+  .tip{
+    background:#fff8e8;
+    border-left:4px solid var(--accent2);
+    padding:12px 16px;
+    border-radius:10px;
+    font-size:13.5px;
+    margin-top:12px;
+  }
+  .warn{
+    background:#fdeeec;
+    border-left:4px solid var(--accent3);
+    padding:12px 16px;
+    border-radius:10px;
+    font-size:13.5px;
+    margin-top:12px;
+  }
+  .tip b,.warn b{font-weight:700;}
+
+  .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;margin-top:12px;}
+  .chip{
+    background:#f8faf8;
+    border:1px solid var(--line);
+    border-radius:14px;
+    padding:16px;
+    transition:all .2s;
+  }
+  .chip:hover{border-color:var(--accent);transform:translateY(-2px);}
+  .chip h4{font-size:14px;margin-bottom:6px;color:#4a7a58;}
+  .chip p{font-size:13px;}
+
+  .matrix .row{display:flex;gap:10px;align-items:stretch;margin:8px 0;}
+  .matrix .scene{flex:0 0 130px;font-weight:700;font-size:13px;color:#4a7a58;background:#eef5f0;border-radius:12px;display:grid;place-items:center;padding:10px;text-align:center;}
+  .matrix .combo{flex:1;font-size:13.5px;background:#f8faf8;border-radius:12px;padding:12px 14px;}
+
+  /* collapsible */
+  details{margin-top:12px;border:1px solid var(--line);border-radius:12px;overflow:hidden;}
+  summary{
+    list-style:none;cursor:pointer;
+    padding:12px 16px;font-weight:700;font-size:14px;
+    background:#f8faf8;display:flex;justify-content:space-between;align-items:center;
+  }
+  summary::-webkit-details-marker{display:none;}
+  summary::after{content:"+";font-size:20px;color:var(--accent);transition:transform .2s;}
+  details[open] summary::after{transform:rotate(45deg);}
+  details .body{padding:14px 18px;font-size:14px;}
+
+  .progress-wrap{margin-top:14px;}
+  .progress-wrap .step{
+    display:flex;gap:12px;align-items:flex-start;
+    padding:10px 0;border-bottom:1px dashed var(--line);
+  }
+  .progress-wrap .step:last-child{border-bottom:none;}
+  .check{
+    flex:none;width:26px;height:26px;border-radius:50%;
+    border:2px solid var(--accent);display:grid;place-items:center;
+    cursor:pointer;font-size:14px;color:transparent;
+    transition:all .2s;
+    user-select:none;
+  }
+  .check.done{background:var(--accent);color:#fff;}
+  .check.done + .txt{text-decoration:line-through;color:var(--sub);}
+
+  footer{text-align:center;color:var(--sub);font-size:12.5px;margin-top:50px;padding-top:24px;border-top:1px solid var(--line);}
+  .theme-toggle{
+    position:fixed;top:18px;right:18px;z-index:50;
+    background:#fff;border:1px solid var(--line);
+    box-shadow:var(--shadow);
+    border-radius:30px;padding:8px 14px;font-size:13px;cursor:pointer;color:var(--ink);
+  }
+  .back-top{
+    position:fixed;bottom:24px;right:24px;
+    width:46px;height:46px;border-radius:50%;
+    background:var(--accent);color:#fff;border:none;
+    font-size:20px;cursor:pointer;box-shadow:var(--shadow);
+    opacity:0;transform:translateY(20px);transition:all .3s;
+  }
+  .back-top.show{opacity:1;transform:translateY(0);}
+
+  /* ---- 新增：反馈层流程图 ---- */
+  .flow-chain{
+    display:flex;flex-wrap:wrap;gap:6px;align-items:center;
+    margin:12px 0;font-size:13px;
+  }
+  .flow-node{
+    background:#f8faf8;border:1px solid var(--line);
+    border-radius:12px;padding:6px 12px;font-weight:600;color:#4a7a58;
+    white-space:nowrap;
+  }
+  .flow-node.active{background:#e3f1e7;border-color:var(--accent);}
+  .flow-node.feedback{background:#e8f4f8;border-color:var(--accent4);color:#2a6a8a;}
+  .flow-arrow{color:var(--sub);font-weight:700;}
+
+  /* ---- 新增：Frame 可视化 ---- */
+  .frame-viz{
+    background:#f8faf8;border:1px solid var(--line);
+    border-radius:14px;padding:18px;margin:12px 0;
+    font-family:monospace;font-size:12.5px;line-height:2;
+    overflow-x:auto;
+  }
+  .frame-viz .arrow{color:var(--accent);font-weight:800;}
+  .frame-viz .node{
+    display:inline-block;background:#fff;border:1px solid var(--accent);
+    border-radius:8px;padding:2px 10px;margin:2px 4px;color:#4a7a58;font-weight:600;
+  }
+  .frame-viz .frame-tag{
+    display:inline-block;background:#fff8e8;border:1px solid var(--accent2);
+    border-radius:8px;padding:2px 10px;margin:2px 4px;color:#a07820;font-size:11px;
+  }
+
+  /* ---- 新增：对比卡片 ---- */
+  .compare-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px;margin-top:14px;}
+  .compare-card{
+    background:#f8faf8;border:1px solid var(--line);
+    border-radius:16px;padding:18px;transition:all .25s;
+  }
+  .compare-card:hover{border-color:var(--accent);transform:translateY(-3px);box-shadow:var(--shadow);}
+  .compare-card .tag{
+    display:inline-block;font-size:11px;font-weight:700;
+    padding:3px 10px;border-radius:10px;margin-bottom:10px;
+  }
+  .compare-card h4{font-size:15px;margin-bottom:8px;color:#2f3b38;}
+  .compare-card p{font-size:13px;line-height:1.6;}
+  .tag-pipe{background:#e3f1e7;color:#4a7a58;}
+  .tag-webrtc{background:#e8f4f8;color:#2a6a8a;}
+  .tag-cpp{background:#f3e8f8;color:#7a4a9a;}
+
+  .code-inline{
+    font-family:monospace;background:#f0f4f0;
+    padding:2px 6px;border-radius:4px;font-size:0.9em;color:#4a7a58;
+  }
+
+  @media (max-width:520px){
+    .hero h1{font-size:24px;}
+    .card{padding:20px 18px;}
+    .matrix .row{flex-direction:column;}
+    .matrix .scene{flex:none;}
+    .flow-chain{flex-direction:column;align-items:flex-start;}
+    .flow-arrow{transform:rotate(90deg);}
+  }
+</style>
+</head>
+<body>
+<button class="theme-toggle" id="themeBtn">🌙 日间</button>
+
+<div class="wrap">
+
+  <header class="hero">
+    <span class="badge">VOICE × AI WORKFLOW</span>
+    <h1>语音 <span class="dot">×</span> AI 协作 Hacks</h1>
+    <p>从「按键」到「AI 工作法」—— 一套系统化的语音协作框架</p>
+  </header>
+
+  <div class="stack">
+
+    <!-- 架构总览 -->
+    <section class="card">
+      <h2><span class="num">0</span><span class="t">整体架构：语音协作的 6 层模型</span></h2>
+      <p class="muted">每一层都有对应的 hack，组合起来就是你的「个人语音 AI 操作系统」。</p>
+      <div class="layers">
+        <div class="layer" data-layer="1"><b>① 触发层</b><div><div>哪个键？长按还是单击？</div><div class="desc">Karabiner / 鼠标侧键 / Fn</div></div></div>
+        <div class="layer" data-layer="2"><b>② 听写层</b><div><div>谁能把声音变成文字？</div><div class="desc">豆包 / Whisper / SuperWhisper</div></div></div>
+        <div class="layer" data-layer="3"><b>③ 清洗层</b><div><div>AI 润色？去口水词？格式化？</div><div class="desc">千问 / Wispr Flow</div></div></div>
+        <div class="layer" data-layer="4"><b>④ 路由层</b><div><div>文字送到哪？ChatGPT / Claude / Cursor？</div><div class="desc">OpenWhispr / Ghost Pepper</div></div></div>
+        <div class="layer" data-layer="5"><b>⑤ 编排层</b><div><div>系统级自动化编排</div><div class="desc">Hammerspoon / Karabiner / AutoHotkey</div></div></div>
+        <div class="layer" data-layer="6"><b>⑥ 反馈层</b><div><div>AI 回复了什么？要不要继续口述？</div><div class="desc">Talk To Your Computer / RCLI</div></div></div>
+      </div>
+      <div class="tip">💡 <b>点击任一层</b>，可快速定位到下方对应章节。</div>
+    </section>
+
+    <!-- 1 触发层 -->
+    <section class="card" id="sec1">
+      <h2><span class="num">1</span><span class="t">触发层：按键哲学</span></h2>
+      <ul>
+        <li><b>长按说话 (Push-to-talk)</b>：按住 Fn/右 Option，松开结束。最符合直觉，豆包默认。</li>
+        <li><b>单击切换 (Click-to-toggle)</b>：点一下开始，再点结束。适合长段口述。</li>
+        <li><b>三段式 (Speak → Review → Send)</b>：第一次按键开始听写，第二次停止，第三次才发送。留出「检查转写结果」的窗口 —— 社区精妙发明，专为 Claude Code / Cursor 设计。</li>
+      </ul>
+      <div class="tip">💡 <b>最佳实践</b>：跟 AI 对话用三段式（重准确性），写文章用长按式（重流速）。</div>
+    </section>
+
+    <!-- 2 听写层 -->
+    <section class="card" id="sec2">
+      <h2><span class="num">2</span><span class="t">听写层：四款主流工具</span></h2>
+      <table>
+        <tr><th>工具</th><th>定位</th><th>适合场景</th></tr>
+        <tr><td>豆包输入法</td><td>中文识别准、中英混输强</td><td>中文环境 + 技术词汇</td></tr>
+        <tr><td>SuperWhisper</td><td>基于 Whisper，转写质量顶级</td><td>英文写作、技术文档</td></tr>
+        <tr><td>Wispr Flow</td><td>AI 润色听写，去口水词 + 自动格式化</td><td>跨 App 写邮件 / Slack</td></tr>
+        <tr><td>VoiceInk</td><td>本地模型 + Context Aware + 个人词典</td><td>给 Cursor / Claude Code 口述复杂 prompt</td></tr>
+      </table>
+      <div class="tip">💡 <b>关键认知</b>：听写工具不是在「转写」，而是在「替你思考如何表达」。</div>
+    </section>
+
+    <!-- 3 清洗层 -->
+    <section class="card" id="sec3">
+      <h2><span class="num">3</span><span class="t">清洗层：AI 润色的争议</span></h2>
+      <p>这里有一个有趣的分叉：</p>
+      <ul>
+        <li><b>豆包路线</b>：原样转写，保留口语风格 → 适合「跟 AI 对话」。</li>
+        <li><b>千问 / Wispr Flow 路线</b>：AI 自动润色 → 适合「让 AI 产出成品」（邮件、周报、纪要）。</li>
+      </ul>
+      <div class="warn">⚠️ <b>跟 AI 对话时，过度润色反而有害</b> —— 你会丢失语气、丢失「嗯」「啊」背后的思考节奏。AI 需要听到真实的你，不是一篇书面稿。所以「豆包原样转写 + 手动微调」是对话场景最优解。</div>
+    </section>
+
+    <!-- 4 路由层 -->
+    <section class="card" id="sec4">
+      <h2><span class="num">4</span><span class="t">路由层：文字去哪儿？</span></h2>
+      <p>社区最火的「builder-to-agent」工作流：</p>
+      <div class="muted" style="font-family:monospace;background:#f8faf8;padding:14px;border-radius:12px;margin-top:8px;">
+        口述 → 本地转写 → AI 清洗 → 发送到 Discord/终端/Cursor → Agent 执行 → 返回 diff/预览
+      </div>
+      <div class="grid" style="margin-top:14px;">
+        <div class="chip"><h4>Ghost Pepper + Qwen</h4><p>开源 Mac 听写，本地 Qwen 清洗，隐私优先。</p></div>
+        <div class="chip"><h4>OpenWhispr</h4><p>语音输入 + AI Agent 热键，可直接作为命令发给 Claude / Gemini。</p></div>
+        <div class="chip"><h4>Whispering / Epicenter</h4><p>全局快捷键听写，专为 Claude Code voice coding 设计。</p></div>
+      </div>
+    </section>
+
+    <!-- 5 编排层 -->
+    <section class="card" id="sec5">
+      <h2><span class="num">5</span><span class="t">编排层：Hammerspoon vs Karabiner</span></h2>
+      <p>macOS 上两个关键自动化工具，定位不同：</p>
+      <ul>
+        <li><b>Karabiner-Elements</b>：底层按键重映射。「Fn → Cmd+1」「长按补回车」。</li>
+        <li><b>Hammerspoon</b>：高层系统自动化。Lua 脚本操控 App、窗口、剪贴板、输入法切换。</li>
+      </ul>
+      <div class="tip">💡 <b>最佳实践</b>：两者配合 —— Karabiner 做键位映射，Hammerspoon 做「按下切豆包、松手切回原输入法」的状态快照与恢复。<br><b>doubao-im-auto-send</b> 就是这个思路的 Swift 实现。</div>
+    </section>
+
+    <!-- 6 反馈层（深化版） -->
+    <section class="card" id="sec6">
+      <h2><span class="num">6</span><span class="t">反馈层：让回复驱动下一次语音</span></h2>
+      <p>前五层解决「你怎么把话送到 AI 嘴里」，反馈层解决「<b>AI 的话怎么让这个循环继续转下去</b>」。</p>
+
+      <h4 style="margin-top:16px;color:#4a7a58;">🔴 没有反馈层（断的）</h4>
+      <div class="flow-chain">
+        <span class="flow-node">你说</span><span class="flow-arrow">→</span>
+        <span class="flow-node">AI 回</span><span class="flow-arrow">→</span>
+        <span class="flow-node" style="opacity:0.5;">🔇 停住，等你按键</span><span class="flow-arrow">→</span>
+        <span class="flow-node" style="opacity:0.5;">你再按一下才能继续</span>
+      </div>
+
+      <h4 style="margin-top:14px;color:#2a6a8a;">🟢 有反馈层（循环的）</h4>
+      <div class="flow-chain">
+        <span class="flow-node">你说</span><span class="flow-arrow">→</span>
+        <span class="flow-node">AI 回</span><span class="flow-arrow">→</span>
+        <span class="flow-node feedback">系统感知「回复完毕」</span><span class="flow-arrow">→</span>
+        <span class="flow-node feedback">自动激活麦克风 / 聚焦输入框</span><span class="flow-arrow">→</span>
+        <span class="flow-node active">你自然说出下一句 ↺</span>
+      </div>
+
+      <div class="tip" style="margin-top:14px;">
+        💡 <b>「让回复驱动下一次语音」的两层含义：</b><br>
+        <b>① 内容驱动</b>：AI 回复的内容直接决定你下一句说什么（上下文延续）。<br>
+        <b>② 时序驱动</b>：AI 回复的「完成事件」成为你「什么时候开口」的触发器 —— 你不再需要盯着屏幕判断"说完了没"。
+      </div>
+
+      <h4 style="margin-top:18px;color:#4a7a58;">三种实现级别</h4>
+      <div class="grid">
+        <div class="chip"><h4>🎙️ 原生级</h4><p>ChatGPT Voice / Claude 语音模式：AI 说完后麦克风自动继续监听，支持随时打断。这是完整的反馈闭环。</p></div>
+        <div class="chip"><h4>🔧 脚本级</h4><p>Hammerspoon 监听窗口/快捷键，在「AI 回复完毕」事件后自动触发豆包语音热键。</p></div>
+        <div class="chip"><h4>✋ 手动级</h4><p>目前最现实：AI 回复完你自然按一下语音键继续。习惯了很顺畅，是 90% 人的现状。</p></div>
+      </div>
+
+      <div class="warn" style="margin-top:14px;">
+        ⚠️ <b>自动感知「AI 回复结束」目前没有标准方案</b>。网页端难以精确监听"流式输出完成"事件。多数人是「手动级」，但这不妨碍体验 —— 因为你的大脑本来就在等 AI 说完。
+      </div>
+
+      <h4 style="margin-top:18px;color:#4a7a58;">社区代表工具</h4>
+      <div class="grid">
+        <div class="chip"><h4>Talk To Your Computer</h4><p>AI 能「看到」你的屏幕，你说「这报错怎么回事」，AI 结合屏幕回答后继续监听。</p></div>
+        <div class="chip"><h4>RCLI</h4><p>完全本地化语音助手，STT+LLM+TTS 全在 Apple Silicon 跑，端到端 &lt;200ms，能控制 38 种 Mac 操作。</p></div>
+        <div class="chip"><h4>ToolPiper</h4><p>右键 Option 激活，本地推送到听写 + 语音命令，127-173ms 延迟。</p></div>
+      </div>
+    </section>
+
+    <!-- 7 三大框架 -->
+    <section class="card">
+      <h2><span class="num">7</span><span class="t">自建语音 Agent：三大框架</span></h2>
+      <p>当你要把语音做成「产品级服务」（不是个人效率工具）时，就需要专业框架。三个主流派系，哲学完全不同：</p>
+
+      <div class="compare-grid">
+        <div class="compare-card">
+          <span class="tag tag-pipe">Python 管道</span>
+          <h4>Pipecat (Daily)</h4>
+          <p><b>哲学</b>：万物皆 Frame，用 Python 管道串起来。<br><br><b>最擅长</b>：最大灵活性，200+ 供应商随意换（今天 GPT 明天通义）。<br><br><b>典型场景</b>：AI 客服、快速原型、想频繁换模型的产品。</p>
+        </div>
+        <div class="compare-card">
+          <span class="tag tag-webrtc">WebRTC 优先</span>
+          <h4>LiveKit Agents</h4>
+          <p><b>哲学</b>：SFU 实时音视频架构，先解决传输再考虑 AI。<br><br><b>最擅长</b>：复杂多人环境、电话集成（PSTN/SIP）。<br><br><b>典型场景</b>：远程会议 AI 助手、虚拟教室、直播互动、实时客服电话。</p>
+        </div>
+        <div class="compare-card">
+          <span class="tag tag-cpp">C++ 图运行时</span>
+          <h4>TEN Framework</h4>
+          <p><b>哲学</b>：把 Agent 建模为有向图，C++ 底层 + 多语言绑定。<br><br><b>最擅长</b>：多模态（语音 + 视觉 + Avatar 原生）。<br><br><b>典型场景</b>：数字人、教育 Avatar、AI 需要「看见」屏幕并操作。</p>
+        </div>
+      </div>
+
+      <h4 style="margin-top:20px;color:#4a7a58;">快速对比表</h4>
+      <table>
+        <tr><th>维度</th><th>Pipecat</th><th>LiveKit Agents</th><th>TEN Framework</th></tr>
+        <tr><td><b>核心架构</b></td><td>Python 管道 + Frame 流</td><td>WebRTC + SFU</td><td>C++ 图运行时</td></tr>
+        <tr><td><b>并发能力</b></td><td>单进程，需自行扩展</td><td>SFU 天然支持多人房间</td><td>高性能 C++，端侧可跑</td></tr>
+        <tr><td><b>多模态</b></td><td>音频/文本为主</td><td>音频/视频原生</td><td>音频+视频+Avatar 原生</td></tr>
+        <tr><td><b>学习曲线</b></td><td>Python 友好，较低</td><td>需懂 WebRTC/SFU</td><td>需懂图运行时，较高</td></tr>
+        <tr><td><b>延迟</b></td><td>中等</td><td>低（毫秒级）</td><td>极低（&lt;300ms）</td></tr>
+      </table>
+
+      <div class="warn" style="margin-top:14px;">
+        ⚠️ <b>对个人用户</b>：你不需要自建。豆包 + Karabiner + Hammerspoon 已达 80% 生产力提升。自建框架是给做产品的开发者准备的。
+      </div>
+    </section>
+
+    <!-- 7b 理解 Frame -->
+    <section class="card">
+      <h2><span class="num">7</span><span class="t" style="font-size:17px;">理解「帧」（Frame）—— 一切皆帧</span></h2>
+      <p>"Frame" 是语音 Agent 框架（尤其 Pipecat）的核心抽象。简单来说：<b>管线中流动的一切数据单元都叫 Frame</b>。</p>
+
+      <div class="frame-viz">
+        <div style="margin-bottom:8px;">
+          <span class="node">🎤 AudioIn</span>
+          <span class="arrow"> → </span>
+          <span class="frame-tag">[AudioFrame]</span>
+          <span class="arrow"> → </span>
+          <span class="node">STT</span>
+          <span class="arrow"> → </span>
+          <span class="frame-tag">[TextFrame]</span>
+          <span class="arrow"> → </span>
+          <span class="node">LLM</span>
+          <span class="arrow"> → </span>
+          <span class="frame-tag">[TokenFrame]</span>
+          <span class="arrow"> → </span>
+          <span class="node">TTS</span>
+          <span class="arrow"> → </span>
+          <span class="frame-tag">[AudioFrame]</span>
+          <span class="arrow"> → </span>
+          <span class="node">🔊 AudioOut</span>
+        </div>
+        <div style="color:var(--sub);font-size:12px;margin-top:6px;">
+          // 任何数据块（音频切片 / 文本 token / 情绪标签 / 函数调用）都是 Frame
+        </div>
+      </div>
+
+      <div class="tip">
+        💡 <b>把一切抽象为帧带来了什么？</b><br>
+        你可以在管线的<b>任意位置</b>拦截、替换、注入 Frame —— 比如在 STT 输出后插入一个「去口水词」节点；在 LLM 输出前注入一个「查数据库」节点。<br><br>
+        <b>Frame = 数据流动的约定 = 系统的可观察单元。</b>
+      </div>
+
+      <div class="grid" style="margin-top:14px;">
+        <div class="chip"><h4>🎵 AudioFrame</h4><p>一段来自麦克风的音频数据（如 20ms 的 PCM 采样）</p></div>
+        <div class="chip"><h4>📝 TextFrame</h4><p>一段转写后的文本（如 "帮我重构这个函数"）</p></div>
+        <div class="chip"><h4>🔧 FunctionCallFrame</h4><p>LLM 决定调用的工具/函数指令</p></div>
+        <div class="chip"><h4>😊 EmotionFrame</h4><p>检测到的情绪标签（用于驱动 Avatar 表情）</p></div>
+      </div>
+
+      <div class="warn" style="margin-top:14px;">
+        ⚠️ <b>为什么 Frame 重要？</b> 它让「流式处理」成为可能 —— AI 不用等你说完才开始处理，而是每收到一个 AudioFrame 就实时推理。这就是为什么语音 Agent 能做到「边说边响应」、打断延迟 &lt;500ms。
+      </div>
+    </section>
+
+    <!-- 8 普通人 vs 开发者 -->
+    <section class="card">
+      <h2><span class="num">8</span><span class="t">普通人 vs 重度开发者：谁在自建 Agent？</span></h2>
+      <p>直接给结论：<b>绝大多数人（含大部分重度开发者）用「AI 输入法 + 小工具定制」，只有少数做产品的人才真正自建 Agent。</b></p>
+      <table style="margin-top:14px;">
+        <tr><th>人群</th><th>主要场景</th><th>推荐路线</th><th>自建 Agent？</th></tr>
+        <tr><td>普通职场人</td><td>与 AI 对话、写邮件、写文档</td><td>豆包 + 系统快捷键</td><td>❌</td></tr>
+        <tr><td>内容创作者</td><td>长文口述、Vibe Coding</td><td>豆包/Typeless + Hammerspoon</td><td>❌</td></tr>
+        <tr><td>个人开发者</td><td>给 Cursor/Claude Code 口述需求</td><td>豆包 + Karabiner 三段式</td><td>❌</td></tr>
+        <tr><td>深度定制者</td><td>全链路控制、本地隐私、特殊硬件</td><td>豆包 + Hammerspoon 深度脚本 + 本地 Whisper</td><td>❌（仍是输入法路线）</td></tr>
+        <tr><td>产品工程师</td><td>做语音客服、电话 Agent、数字人</td><td>Pipecat / LiveKit / TEN</td><td>✅</td></tr>
+        <tr><td>企业/研究团队</td><td>多模态 Agent、可控低延迟</td><td>Pipecat 企业版 / 自研管线</td><td>✅</td></tr>
+      </table>
+      <div class="tip" style="margin-top:14px;">
+        💡 <b>判断分界线</b>：你的语音是「输送给已有的 AI 对话框」，还是「你自己要做能听能说能做事的 AI 实体」？<br>
+        <b>前者 → 输入法 + 小工具（你在这里 ✅）</b><br>
+        <b>后者 → 框架级 Agent 开发（留给未来）</b>
+      </div>
+    </section>
+
+    <!-- 9 五条最佳实践 -->
+    <section class="card">
+      <h2><span class="num">9</span><span class="t">AI 协作 5 条最佳实践</h2>
+      <details open>
+        <summary>展开 / 收起</summary>
+        <div class="body">
+          <p><b>1. 语音负责「捕获」，不负责「决策」</b><br>重要的 prompt 一定要留「人工确认窗口」—— 所以推荐手动补 Enter，而非全自动发送。</p>
+          <p style="margin-top:10px;"><b>2. 润色要分级</b><br>跟 AI 对话→零/轻润色；让 AI 写邮件→重度润色；让 AI 写代码→中等润色（保留术语原样）。</p>
+          <p style="margin-top:10px;"><b>3. 上下文比流速更重要</b><br>语音的真正价值不在于「快」，而在于让你愿意多说。口述能自然产出 200 字的问题，打字可能只写 50 字 —— 多说的 150 字就是给 AI 的上下文红利。</p>
+          <p style="margin-top:10px;"><b>4. 输入法切换要隐形</b><br>用 Hammerspoon / Karabiner 做状态快照 + 恢复，让语音输入法成为「临时覆盖层」而非「切换目标」。</p>
+          <p style="margin-top:10px;"><b>5. 建立个人语音工作流矩阵</b><br>不同场景用不同工具组合（见下方）。</p>
+          <p style="margin-top:10px;"><b>6. 反馈层是最高级形态</b><br>从「单次命令-响应」升级为「持续对话循环」，让 AI 的回复自然成为下一轮的触发。</p>
+        </div>
+      </details>
+    </section>
+
+    <!-- 10 工作流矩阵 -->
+    <section class="card matrix">
+      <h2><span class="num">10</span><span class="t">个人语音工作流矩阵</span></h2>
+      <div class="row"><div class="scene">跟 ChatGPT / Claude 对话</div><div class="combo">豆包 + 手动 Enter + 三段式 Karabiner</div></div>
+      <div class="row"><div class="scene">给 Cursor / Claude Code 口述需求</div><div class="combo">VoiceInk 或 SuperWhisper + 右键快捷键</div></div>
+      <div class="row"><div class="scene">写邮件 / Slack</div><div class="combo">Wispr Flow（AI 润色）</div></div>
+      <div class="row"><div class="scene">跨 App 快速笔记</div><div class="combo">豆包长按 + Hammerspoon 输入法恢复</div></div>
+      <div class="row"><div class="scene">屏幕感知对话</div><div class="combo">Talk To Your Computer</div></div>
+      <div class="row"><div class="scene">做语音产品 / Agent</div><div class="combo">Pipecat / LiveKit Agents / TEN Framework</div></div>
+    </section>
+
+    <!-- 11 探索路径 checklist -->
+    <section class="card">
+      <h2><span class="num">11</span><span class="t">你的探索路径</span></h2>
+      <p class="muted">按此顺序玩，性价比最高。可勾选追踪进度 👇</p>
+      <div class="progress-wrap" id="checklist">
+        <div class="step"><span class="check">✓</span><span class="txt">本周：把豆包 + Hammerspoon（输入法恢复）+ 手动 Enter 跑顺</span></div>
+        <div class="step"><span class="check">✓</span><span class="txt">下周：试用 Wispr Flow 免费档，感受 AI 润色听写的差异</span></div>
+        <div class="step"><span class="check">✓</span><span class="txt">月底：装 VoiceInk，体验本地 Whisper + Context Aware 给 Cursor 口述</span></div>
+        <div class="step"><span class="check">✓</span><span class="txt">进阶：玩 Karabiner 三段式规则，做到「口述→检查→发送」全流程键盘化</span></div>
+        <div class="step"><span class="check">✓</span><span class="txt">反馈层：尝试让 AI 回复后自动激活麦克风，体验「对话循环」</span></div>
+        <div class="step"><span class="check">✓</span><span class="txt">终极：若现有工具都不够爽，用 Pipecat 自建专属语音 Agent</span></div>
+      </div>
+    </section>
+
+  </div>
+
+  <footer>
+    核心认知：语音输入法不是一个「功能」，而是你与 AI 协作的「自然语言接口」。<br>
+    最好的语音 AI 工作流，不是让发送更快，而是让「想说」更容易。<br><br>
+    Made with ♡ · 小清新 Fomo 风格
+  </footer>
+
+</div>
+
+<button class="back-top" id="backTop" title="回到顶部">↑</button>
+
+<script>
+(function(){
+  "use strict";
+
+  // ---- 1. 日间 / 夜间主题切换 ----
+  var themeBtn = document.getElementById('themeBtn');
+  var root = document.documentElement;
+  var saved = localStorage.getItem('va_theme') || 'light';
+  applyTheme(saved);
+  themeBtn.addEventListener('click', function(){
+    var cur = root.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+    applyTheme(cur);
+    localStorage.setItem('va_theme', cur);
+  });
+  function applyTheme(t){
+    if(t === 'dark'){
+      root.setAttribute('data-theme','dark');
+      themeBtn.textContent = '☀️ 夜间';
+      root.style.setProperty('--bg','#1e2522');
+      root.style.setProperty('--card','#2a3330');
+      root.style.setProperty('--ink','#eef3f0');
+      root.style.setProperty('--sub','#9fb5ae');
+      root.style.setProperty('--line','#3a4642');
+    } else {
+      root.removeAttribute('data-theme');
+      themeBtn.textContent = '🌙 日间';
+      root.style.setProperty('--bg','#f4f7f5');
+      root.style.setProperty('--card','#ffffff');
+      root.style.setProperty('--ink','#2f3b38');
+      root.style.setProperty('--sub','#6b7c77');
+      root.style.setProperty('--line','#e8eee9');
+    }
+  }
+
+  // ---- 2. 架构层 → 章节平滑跳转 ----
+  var layers = document.querySelectorAll('.layer');
+  for(var i=0;i<layers.length;i++){
+    layers[i].addEventListener('click', function(){
+      var n = this.getAttribute('data-layer');
+      var target = document.getElementById('sec' + n);
+      if(target){
+        if(target.scrollIntoView){ target.scrollIntoView({behavior:'smooth', block:'start'}); }
+        else { window.scrollTo(0, target.offsetTop); }
+        target.style.transition = 'box-shadow .3s';
+        target.style.boxShadow = '0 0 0 3px rgba(123,185,138,.5)';
+        setTimeout(function(){ target.style.boxShadow = ''; }, 1200);
+      }
+    });
+  }
+
+  // ---- 3. 章节卡片进入视口时淡入 ----
+  if('IntersectionObserver' in window){
+    var io = new IntersectionObserver(function(entries){
+      for(var i=0;i<entries.length;i++){
+        if(entries[i].isIntersecting){
+          entries[i].target.style.opacity = '1';
+          entries[i].target.style.transform = 'translateY(0)';
+          io.unobserve(entries[i].target);
+        }
+      }
+    }, {threshold:0.12});
+    var cards = document.querySelectorAll('.card');
+    for(var c=0;c<cards.length;c++){
+      cards[c].style.opacity = '0';
+      cards[c].style.transform = 'translateY(24px)';
+      cards[c].style.transition = 'opacity .5s ease, transform .5s ease';
+      io.observe(cards[c]);
+    }
+  }
+
+  // ---- 4. 探索路径可勾选 checklist ----
+  var checks = document.querySelectorAll('.check');
+  for(var k=0;k<checks.length;k++){
+    checks[k].addEventListener('click', function(){
+      this.classList.toggle('done');
+    });
+  }
+
+  // ---- 5. 回到顶部按钮 ----
+  var backTop = document.getElementById('backTop');
+  window.addEventListener('scroll', function(){
+    if(window.scrollY > 400){ backTop.classList.add('show'); }
+    else { backTop.classList.remove('show'); }
+  });
+  backTop.addEventListener('click', function(){
+    window.scrollTo({top:0, behavior:'smooth'});
+  });
+
+})();
+</script>
+</body>
+</html>
