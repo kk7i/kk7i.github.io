@@ -1,0 +1,377 @@
+<!doctype html>
+<html lang="zh">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>The Folder Is the Agent · 交互解读</title>
+<style>
+:root{
+  --bg:#F5F0EB; --card:#FFFDF9; --ink:#2B2723; --muted:#7A7068;
+  --line:#E7DED3; --accent:#2F8F6B; --accent-soft:#E4F1EA;
+  --warn:#C9762B; --warn-soft:#FBEEE1; --expert:#6B5BD6; --expert-soft:#ECEAFB;
+  --blue:#2D7FB8; --blue-soft:#E3EEF7; --red:#B23B3B; --red-soft:#FBEAEA;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);
+  font:15px/1.7 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif}
+.wrap{max-width:900px;margin:0 auto;padding:32px 22px 80px}
+header{border-bottom:1px solid var(--line);padding-bottom:20px;margin-bottom:24px}
+h1{font-size:28px;margin:0 0 8px;letter-spacing:.2px}
+.sub{color:var(--muted);font-size:14px}
+.brief{background:var(--card);border:1px solid var(--line);border-left:4px solid var(--accent);
+  border-radius:14px;padding:16px 18px;font-size:14.5px;color:#4a443e;margin-bottom:28px}
+.brief b{color:var(--ink)}
+.card{background:var(--card);border:1px solid var(--line);border-left:5px solid var(--muted);
+  border-radius:16px;padding:22px 24px;margin-bottom:20px}
+.card .tag{font-size:11px;letter-spacing:.8px;text-transform:uppercase;color:var(--muted);margin-bottom:6px}
+.card h3{margin:0 0 10px;font-size:18px;line-height:1.4}
+.card .lead{color:#574f48;font-size:14.5px;margin:0 0 12px}
+.card .quote{border-left:3px solid var(--accent);background:var(--accent-soft);
+  padding:8px 12px;border-radius:8px;font-style:italic;color:#2f4a3a;font-size:14px;margin:10px 0}
+.card .explain{background:#faf7f3;border:1px dashed var(--line);border-radius:10px;
+  padding:10px 14px;font-size:13.5px;color:#5a524a;margin:10px 0}
+.card .plain{background:#faf7f3;border:1px solid var(--line);border-radius:10px;padding:10px 14px;font-size:13.5px;color:#4a443e;margin:10px 0}
+.card .expert{border-left:3px solid var(--expert);background:var(--expert-soft);
+  padding:8px 12px;border-radius:8px;font-size:13.5px;color:#2f2a55;margin:10px 0}
+.card .warn{border-left:3px solid var(--warn);background:var(--warn-soft);padding:8px 12px;border-radius:8px;font-size:13.5px;margin:10px 0}
+.card .do{list-style:none;margin:10px 0;padding:0}
+.card .do li{position:relative;padding-left:22px;margin:7px 0;font-size:13.5px}
+.card .do li:before{content:"✓";position:absolute;left:0;color:var(--accent);font-weight:700}
+.card .dont{list-style:none;margin:10px 0;padding:0}
+.card .dont li{position:relative;padding-left:22px;margin:7px 0;font-size:13.5px}
+.card .dont li:before{content:"✕";position:absolute;left:0;color:var(--red);font-weight:700}
+.card ul{margin:8px 0 4px 20px;padding:0}
+.card li{margin:5px 0}
+.card .lbl{font-size:11px;letter-spacing:.6px;text-transform:uppercase;color:var(--muted);margin:14px 0 8px}
+.card .lbl:first-child{margin-top:0}
+
+.timeline{list-style:none;margin:12px 0 0;padding:0;border-left:2px solid var(--line)}
+.timeline li{position:relative;padding:0 0 16px 20px}
+.timeline li:before{content:"";position:absolute;left:-7px;top:6px;width:12px;height:12px;border-radius:50%;background:var(--accent);border:2px solid var(--card)}
+.timeline b{display:block;font-size:14px;color:var(--ink)}
+.timeline span{font-size:13px;color:var(--muted)}
+
+.compare{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin:12px 0}
+.compare .col{background:#faf7f3;border-radius:12px;padding:14px}
+.compare h4{margin:0 0 10px;font-size:14.5px}
+.bar-row{margin-bottom:10px}
+.bar-label{display:flex;justify-content:space-between;font-size:12px;color:var(--muted);margin-bottom:3px}
+.bar{height:10px;border-radius:99px;background:var(--line)}
+.bar > i{display:block;height:100%;border-radius:99px;background:var(--muted)}
+.bar.strong > i{background:var(--accent)}
+.bar.weak > i{background:var(--warn)}
+
+table{width:100%;border-collapse:collapse;margin:10px 0;font-size:13px}
+table th,table td{border:1px solid var(--line);padding:8px 10px;text-align:left;vertical-align:top}
+table th{background:#faf7f3;color:var(--ink);font-weight:600}
+table tr:nth-child(even){background:#fdfbf8}
+
+.step-ring{display:flex;align-items:center;justify-content:space-between;gap:8px;margin:14px 0;flex-wrap:wrap}
+.step{flex:1;min-width:70px;background:var(--accent-soft);border:1px solid #cfe6d9;border-radius:12px;padding:12px 8px;text-align:center;font-size:13px;color:#234;font-weight:600}
+.step:nth-child(2){background:var(--blue-soft);border-color:#cfe0ee}
+.step:nth-child(3){background:var(--warn-soft);border-color:#f0dcc6}
+.step:nth-child(4){background:var(--expert-soft);border-color:#dcdaf4}
+
+.stack{margin:14px 0}
+.layer{background:#faf7f3;border:1px solid var(--line);border-radius:10px;padding:10px 14px;margin-bottom:6px;font-size:13.5px}
+.layer b{color:var(--ink)}
+.layer small{display:block;color:var(--muted);font-size:12px}
+
+.src{font-size:12px;color:var(--muted);margin-top:10px}
+.src b{color:#574f48}
+
+@media(max-width:600px){
+  body{font-size:14px}
+  .card{padding:16px 16px}
+  h1{font-size:23px}
+  .compare{grid-template-columns:1fr}
+  .step-ring{flex-direction:column}
+  .step{width:100%}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>The Folder Is the Agent</h1>
+    <div class="sub">Kieran Klaassen · Every / Cora · 交互解读（最佳实践版）</div>
+  </header>
+
+  <div class="brief">
+    <b>这篇文章在讲什么？</b> 作者花了 3 个月尝试用多个 AI agent 协作干活，结果发现<b>问题不在 AI 不够聪明，而在上下文不够</b>。
+    核心洞察：<b>一个 agent 是什么水平，取决于你给它哪个文件夹</b>——文件夹里装着它的记忆、规则和工具。
+    本文教你如何把“一个文件夹”变成“一个专家”，以及为什么不该一上来就搞复杂编排。
+  </div>
+
+  <!-- ⓪ -->
+  <div class="card">
+    <div class="tag">⓪ 背景</div>
+    <h3>作者是谁？他遇到了什么问题？</h3>
+    <p class="lead">Kieran Klaassen 是 <b>Cora</b> 的创始人——Cora 是一个真实在运营的 AI 日历助手产品（帮你安排日程、管理会议）。他花了 3 个月，用多个 AI agent 协作来加速 Cora 的开发，结果令人失望：agent 越多，人反而越累。</p>
+    <div class="plain"><b>先说清两个词，后面通篇都用：</b><br>· <b>Agent</b>——能读文件、跑命令、连工具的 AI 助手（本文指 Claude Code 这类编程 agent）。<br>· <b>上下文（context）</b>——agent 工作时能看到的所有信息：代码、文档、规则、历史记录。上下文越干净、越对口，agent 越靠谱；上下文一杂，它就胡说八道。</div>
+    <div class="quote">"AI agents don't have a speed limit, but the person managing them still does."</div>
+    <div class="explain"><b>大白话：</b>10 个 agent 同时交差，你得到 10 份结果，却没有足够上下文判断哪个可信。AI 再快，审核的人成了瓶颈。</div>
+    <div class="expert"><b>专家视角：</b>多 agent 演示常是 theatre——一次性成功 ≠ 可复用系统。能并行 ≠ 该并行。</div>
+  </div>
+
+  <!-- Ⅰ -->
+  <div class="card">
+    <div class="tag">Ⅰ 核心洞察</div>
+    <h3>Agent = 模型 + 文件夹（文件夹就是它的记忆）</h3>
+    <p class="lead">同一个 AI 模型，指向不同的文件夹，就变成完全不同的“专家”。</p>
+    <div class="quote">"Just by changing the folder and not the model, I have a different agent."</div>
+    <div class="explain"><b>背景：这说的是 Claude Code 的工作方式。</b>Claude Code 这类编程 agent 打开一个项目时，会自动读取项目根目录里的 <b>CLAUDE.md</b> 当"系统指令"。所以你写在 CLAUDE.md 里的每句话，都等于在告诉它"该怎么干这个项目"。这也解释了为什么"换个文件夹就换了个 agent"。</div>
+    <div class="plain"><b>类比：</b>想象一个实习生。你给他《公司手册》+ 项目文档，他能干活；给他《运维手册》+ 服务器日志，他也能干活。AI 也一样——<b>文件夹就是它的入职培训</b>。文件夹里装的东西，就是它的全部世界。</div>
+    <div class="lbl">文件夹里有什么（2026 年的标准结构）</div>
+    <ul>
+      <li><b>CLAUDE.md / AGENT.md</b> — 给 AI 的“员工手册”：命名规范、架构决策、常见陷阱</li>
+      <li><b>.claude/skills/</b> — 给 AI 的“操作手册”：如何连数据库、如何查日志</li>
+      <li><b>docs/</b> — 项目文档、事故复盘</li>
+      <li><b>bin/</b> — 自动化脚本（调度器、健康检查）</li>
+    </ul>
+    <div class="lbl">怎么写好 CLAUDE.md（官方给出的写法标准）</div>
+    <ul>
+      <li><b>用 <code>/init</code> 起步。</b>Claude Code 的 <code>/init</code> 会扫描你的代码库自动生成一份 CLAUDE.md 草稿（构建命令、测试约定、项目规范都帮你推断出来），你再往上补它推断不出来的部分，而不是从零写。</li>
+      <li><b>控制在 200 行以内。</b>CLAUDE.md 会在每次会话开头加载、计入 token——越长，遵循度反而越差。写不下就拆到子目录的 CLAUDE.md 或 <code>.claude/rules/</code>，按需加载。</li>
+      <li><b>指令要"可验证"，不要写口号。</b>"用 2 空格缩进"能被照做，"代码写规范一点"会被当成废话。官方给出的准绳是：<b>如果 AI 照字面执行这条指令，得到的结果是不是你想要的？</b></li>
+      <li><b>定期清冲突。</b>两条规则互相矛盾时，AI 会自己挑一条执行，结果不可预测。定期扫一遍 CLAUDE.md、子目录的 CLAUDE.md、<code>.claude/rules/</code>，删掉过时和互相打架的条目。</li>
+    </ul>
+    <div class="lbl">Skills：让"操作手册"按需加载（progressive disclosure）</div>
+    <div class="plain">Skills 是放进 <code>.claude/skills/</code> 的"能力包"——一份 SKILL.md 加可选的示例、模板、脚本。它的聪明之处在于<b>分级加载</b>：启动时只加载每个 skill 的 name + description（几百字），skill 被命中时才加载它的正文，用到的模板和示例才最后加载。这样你能装 100 个 skill，启动时的上下文开销只有几 KB。<br><b>最容易被忽略的一点：</b>skill 能不能被用上，基本取决于 description 写没写清"什么时候用"。写得太笼统（比如"API 测试工具"），AI 就永远不会想起它。</div>
+    <div class="expert"><b>专家视角：</b>这套机制有个正式名字——<b>Context Engineering（上下文工程）</b>。Thoughtworks 的定义是"curating what the model sees so that you get a better result"（精心策划模型看到的内容，以得到更好的结果）。它和 prompt engineering 的区别是：prompt 只管"我这一轮怎么说"，context engineering 管的是<b>整个窗口</b>——系统指令、工具定义、检索结果、对话历史、记忆——而这些往往才是 token 的大头。一句话：<b>CLAUDE.md 是"agent 的宪法"，Skills 是"新员工的 onboarding doc"，而上下文工程是让这两者真正生效的学科。</b></div>
+  </div>
+
+  <!-- Ⅱ -->
+  <div class="card">
+    <div class="tag">Ⅱ 最佳实践：用“多个文件夹”替代“多个 agent”</div>
+    <h3>两个文件夹 = 两个不同专家（关键：隔离带来安全与专注）</h3>
+    <p class="lead">同一个模型（Opus），配两个不同的文件夹，得到两个完全不同的“员工”。这不是技巧，而是构建可靠 AI 系统最重要的一条原则。</p>
+    <table>
+      <tr><th>文件夹</th><th>角色</th><th>知道什么</th><th>关键边界</th></tr>
+      <tr><td>~/cora/</td><td>功能工程师</td><td>架构、测试约定、组件创建、产品知识</td><td>只写新功能</td></tr>
+      <tr><td>~/cora-agent/</td><td>运维工程师</td><td>AppSignal、日志、Postgres replica、Intercom、Slack 通知</td><td><b>没有 app 代码</b>，绝不会误改生产</td></tr>
+    </table>
+
+    <div class="lbl">为什么要“拆文件夹”（行业里的先进做法）</div>
+    <ul>
+      <li><b>上下文隔离 = 关注点分离。</b>写代码的 agent 不该看到生产数据库密码，动生产的 agent 不该被业务需求干扰。各管一段，错误不会跨域传染。</li>
+      <li><b>权限天然收敛。</b>文件夹里没有的东西，agent 就摸不到。这是最简单也最牢的权限模型——比事后加审批网关更省心。</li>
+      <li><b>出错可定位。</b>一个文件夹对应一个职责，出了问题一眼知道去哪查，不用在 10 个 agent 的日志里大海捞针。</li>
+      <li><b>资产可累积。</b>CLAUDE.md / runbooks / postmortems 越写越厚，三个月后这个文件夹就成了别人抄不走的壁垒。</li>
+    </ul>
+
+    <div class="lbl">你可以照搬的 4 条最佳实践</div>
+    <ul class="do">
+      <li><b>一个职责 = 一个文件夹。</b>写代码、查数据、做研究、管运营，各开各的目录，绝不混用。</li>
+      <li><b>文件夹之间默认不通。</b>不共享上下文、不共享凭证、不共享状态。需要协作就通过文件/文档传递，而不是让 agent 互相对话。</li>
+      <li><b>按最小权限配置。</b>“运维”文件夹只给数据库只读 + 日志查看；“写代码”文件夹不给生产环境任何入口。</li>
+      <li><b>给每个文件夹一份 CLAUDE.md。</b>写明“你是谁、你管什么、你不能做什么、常用命令有哪些”——这 4 行就是它的岗位说明。</li>
+    </ul>
+    <ul class="dont">
+      <li>别用一个“万能文件夹”让 agent 身兼十职——上下文一杂，输出就开始胡说。</li>
+      <li>别让多个 agent 共享同一份上下文，然后用“加审批”来补救——治标不治本。</li>
+    </ul>
+    <div class="explain"><b>一句话记住：</b>不要造“10 个全能员工”，要造“5 个各管一段的专家”。文件夹就是它们的工位。</div>
+  </div>
+
+  <!-- Ⅲ -->
+  <div class="card">
+    <div class="tag">Ⅲ 最佳实践：别把精力花在“调度”上</div>
+    <h3>真正复杂的不是“调度”，而是“文件夹”</h3>
+    <p class="lead">调度层其实很简单：一个 Ruby 守护进程 + 文件消息，没有复杂的网络协议。难的是把每个文件夹的上下文写对。</p>
+    <div class="explain"><b>类比：</b>就像项目经理在工单系统里派活——把任务写成文件，worker 在正确的文件夹里被拉起，每 60 秒检查状态。</div>
+
+    <div class="lbl">把文件夹养好的 5 条心法（思维方式）</div>
+    <ul>
+      <li><b>① 上下文是产品，不是配置。</b>很多人把 CLAUDE.md 当成一次性 prompt 随手一粘。错。它是你持续维护的“产品说明书”，需要像代码一样版本管理、定期更新。</li>
+      <li><b>② 先写“不能做什么”，再写“能做什么”。</b>权限和禁区写在前面，agent 才不容易越界。这比事后加审批更省心。</li>
+      <li><b>③ 让 agent 读历史，而不是凭空猜。</b>事故复盘、部署日志、决策记录都丢进文件夹——agent 的“经验”来自这里。</li>
+      <li><b>④ 调度越朴素越好。</b>文件消息、定时任务、工单系统，够用就行。别急着上复杂的编排框架，那只是把复杂度从“上下文”搬到“调度”。</li>
+      <li><b>⑤ 文件夹的结构要稳定。</b>路径一变，agent 的肌肉记忆就废了。定好结构就别乱改，改了要同步更新 CLAUDE.md。</li>
+    </ul>
+
+    <div class="layer"><b>调度伪代码</b><small>watch(spawn_requests/) → lead agent → 写 subtask_*.md → daemon 在正确文件夹拉起 worker → 写回 result_*.md → 每 60 秒检查状态</small></div>
+    <div class="expert"><b>专家视角：</b>文件消息很“土”，但可观测、可重放、可调试——比 agent 之间互相喊话更稳。大多数团队缺的不是更好的调度器，而是更干净、更完整的上下文。</div>
+  </div>
+
+  <!-- Ⅳ -->
+  <div class="card">
+    <div class="tag">Ⅳ 真实代价：多 agent 的三大暗病</div>
+    <h3>44 个 agent 不是“自动跑起来就完了”</h3>
+    <p class="lead">规模上来后，会出现三类问题。每类都用“大白话 + 后果 + 怎么防”讲清楚，照着自查就行。</p>
+
+    <div class="lbl">暗病 1 · Encoding bug（编码乱码：看起来没问题，其实崩了）</div>
+    <div class="plain">em dash（—）和弯引号（""''）这类特殊字符，在强制 US-ASCII 的守护进程里会直接报错，作者查了<b>好几周</b>才定位。这类 bug 的特点是<b>不会立刻暴露</b>，往往等到深夜告警才发现。</div>
+    <div class="do"><li>统一所有脚本、日志、文件用 UTF-8，从源头消灭 encoding bug。</li></div>
+
+    <div class="lbl">暗病 2 · Context drift（上下文漂移：agent 在干昨天的活）</div>
+    <div class="plain">agent 用的是旧上下文，或者重复别人已经做完的任务——它不知道“这件事上午有人干过了”。本质是<b>没有共享的任务状态</b>。而这只是 context 失效的四种模式之一：<b>overload</b>（信息太多）、<b>distraction</b>（无关信息被当成重点）、<b>contamination</b>（错误信息混进正确信息）、<b>drift</b>（长时间运行后逐步退化）。</div>
+    <div class="do"><li>维护一份“当前任务清单”（如 subtask_*.md 的状态字段），agent 开工前先读最新状态，避免重复劳动。</li></div>
+
+    <div class="lbl">暗病 3 · Agent stalls（卡死：永远显示 working）</div>
+    <div class="plain">API 调太快会限流，等输入又会无限挂起。状态永远停在 working，人还得手动去救。</div>
+    <div class="do"><li>给每个任务设超时和重试上限；超时就标记 failed 并报警，绝不静默卡死（stall）。</li></div>
+
+    <div class="lbl">一个容易低估的放大效应：上下文腐烂会传染</div>
+    <div class="plain">单 agent 里 context drift 只是它自己输出变差；多 agent 里，Agent A 被污染的产出会作为“事实”进到 Agent B 的上下文，B 的结论再传给 C——<b>每跳一次，错误就被放大一次</b>。这就是为什么多 agent 系统的协调成本随团队规模<b>平方级</b>上升，而不是线性上升。反过来也说明：隔离上下文（参考 Ⅱ）不只是为了专注，更是为了给错误“上防火墙”。</div>
+
+    <div class="warn"><b>现实代价：</b>没有自动清理方案时，Kieran 只能定期手动 prune，并接受一部分 token 被浪费。这就是“全自动”背后的隐形成本。</div>
+    <div class="warn"><b>token 账也要算：</b>单 agent 的 agentic coding 任务约消耗普通聊天的 <b>1000×</b> token，同一任务内也有约 30× 的波动，而准确率并不随开销同步上升。另有实证做法（Bai 等，2026）通过 PLAN.md / INVARIANTS.md + 每轮读取预算 + 子 agent 用带外便签协调，能把长任务的 token 用量压低 70–90%。</div>
+    <div class="expert"><b>专家视角：</b>多 agent 的隐性成本——状态、归属、回滚、人工审计——全都会回来找你。三个暗病加起来指向同一件事：<b>规模化的难点从来不是“让 agent 跑起来”，而是“让它跑得对、跑得完、跑得可查”。</b></div>
+  </div>
+
+  <!-- Ⅴ -->
+  <div class="card">
+    <div class="tag">Ⅴ 实操框架：不能靠感觉编排</div>
+    <h3>You can't vibe orchestrate（先会用，再谈自动化）</h3>
+    <p class="lead">这是全文最值得照做的部分：把"上 agent 协作"拆成四步，每一步都有明确的<b>通过标准</b>。跳过任何一步，agent 就会给你开已经做过的 PR、建重复的 issue。</p>
+    <div class="quote">"Build it, use it, trust it, and then orchestrate it."</div>
+
+    <div class="lbl">四步走（每步都有验收标准）</div>
+    <div class="step-ring">
+      <div class="step">① Build<br><small>搭好文件夹和 flow</small></div>
+      <div class="step">② Use<br><small>自己跑到行为可预测</small></div>
+      <div class="step">③ Trust<br><small>确认可靠再交给调度</small></div>
+      <div class="step">④ Orchestrate<br><small>机器替你路由</small></div>
+    </div>
+
+    <div class="lbl">第 ① 步 · Build：把上下文资产建起来</div>
+    <ul class="do">
+      <li>写好 CLAUDE.md（角色、边界、常用命令、禁区），并纳入版本管理。</li>
+      <li>把 runbooks、postmortems、架构决策记录（ADR）放进文件夹，让 agent 有"经验"可读。</li>
+      <li>定好文件夹结构并固定下来——路径一变，agent 的肌肉记忆就废了。</li>
+    </ul>
+    <div class="explain"><b>通过标准：</b>一个新 agent 只读这份文件夹，就能在你不在场时做出 80% 的正确判断。</div>
+
+    <div class="lbl">第 ② 步 · Use：自己先当 operator</div>
+    <ul class="do">
+      <li>不接调度、不跑并行，先单 agent 单文件夹手动跑一遍，观察它每一轮在做什么。</li>
+      <li>记录它反复出错的地方，回头补进 CLAUDE.md 或 skills——这是上下文资产增值的过程。</li>
+      <li>统计它在哪些任务上稳定、哪些任务会飘（context drift / hallucination）。</li>
+    </ul>
+    <div class="explain"><b>通过标准：</b>同一个任务连续跑 5 次，输出偏差在你可接受范围内，行为可预测。</div>
+
+    <div class="lbl">第 ③ 步 · Trust：量化可靠性</div>
+    <ul class="do">
+      <li>建立小批量验收集：挑 10–20 个典型任务，对比 agent 输出和你的人工预期。</li>
+      <li>先看"该做没做"（漏召回）和"不该做却做了"（越权）两类错误，再谈加速。</li>
+      <li>只在限权（read-only / scoped tools）下验证，出错代价可控。</li>
+    </ul>
+    <ul class="dont">
+      <li>别用"它这次做对了"当证据——单点成功无法证明稳定，那是 vibe 不是证据。</li>
+    </ul>
+    <div class="explain"><b>通过标准：</b>在限定权限内连续 N 次无越权、无重复劳动，你才敢把它的产物直接合并。</div>
+
+    <div class="lbl">第 ④ 步 · Orchestrate：才上调度</div>
+    <ul class="do">
+      <li>用最简单的 dispatcher（文件消息 / 工单 / 定时任务）派活，让 lead agent 按 task manifest 分发。</li>
+      <li>给每个 subtask 设超时、重试上限和状态字段，杜绝"永远 working"的卡死。</li>
+      <li>保持 context isolation：每个 worker 只在自己的文件夹里工作，靠文件传递交接物。</li>
+      <li>在关键节点（部署、改数据、外发）保留 human approval gate。</li>
+    </ul>
+    <div class="explain"><b>通过标准：</b>你能说出当前每个 agent 在干什么、产出物在哪、失败了谁负责——这就是"可运营"，而不是"在跑"。</div>
+
+    <div class="warn"><b>最常见的失败：</b>从 ① 直接跳到 ④。上下文还没养成就上并行，结果不是加速，而是把混乱放大 N 倍——Kieran 的 swarm 经历正是教训。</div>
+    <div class="expert"><b>专家视角：</b>编排不是起点，是终点。这套四步其实是把"上下文工程（context engineering）"当成了可验证的工程产物，而不是靠感觉调 prompt。上下文成熟了，自动化才安全。</div>
+  </div>
+
+  <!-- Ⅵ -->
+  <div class="card">
+    <div class="tag">Ⅵ 行业在往哪走</div>
+    <h3>从“让一群 AI 乱跑”到“专人专岗 + 平台管运行”</h3>
+    <p class="lead">大白话：过去大家迷恋“10 个 agent 一起干活很酷”，现在行业转向“<b>每个 agent 只做一件事、平台替你管住它</b>”。专业地说，就是从 <b>agent swarm</b> 走向 <b>specialist agents + managed runtime</b>。这跟 Kieran 用两个文件夹拆专家，是同一件事。</p>
+
+    <div class="lbl">三个阶段，看懂这波变化</div>
+    <ul class="timeline">
+      <li><b>① Agent Swarm（群聊模式）</b><span>一群 agent 各自发言、自由协作，共享上下文。看起来热闹，实际互相干扰、人审不过来。</span></li>
+      <li><b>② Context Isolation + MCP（分槽干活）</b><span>每个 agent 分到独立上下文窗口，用 <b>Model Context Protocol (MCP)</b> 统一接入工具，不再各自造轮子。</span></li>
+      <li><b>③ Managed Runtime（平台托管）</b><span><b>sandboxing / durable state / observability / human approval gate</b> 由平台接管，人只管“同意还是拒绝”。</span></li>
+    </ul>
+
+    <div class="lbl">两个具体进展（截至 2026 年）</div>
+    <ul>
+      <li><b>MCP 规范 2026-07-28 大改版：</b>协议核心彻底<b>无状态化</b>——删掉了 initialize 握手和会话 ID，每个请求自描述，可以落在普通轮询负载均衡后的任意实例上。新增 <code>Mcp-Method</code> / <code>Mcp-Name</code> 两个 HTTP 头，网关不用解析请求体就能按工具路由、计量和限流；需要中途追问时改用 <b>Multi Round-Trip Requests</b>（服务器返回 <code>input_required</code>，客户端补答后重试原调用）。<b>Tasks 从实验特性转正</b>为正式扩展，并强制对齐 OAuth 2.1。官方同时明确：协议无状态 ≠ 你的应用无状态，需要跨调用保持状态时，由工具返回一个显式 handle 让模型自己在线程间传递。目前 Tier 1 SDK 月下载量已接近 5 亿次。</li>
+      <li><b>Claude Managed Agents 进入公开 beta：</b>Anthropic 把它做成托管服务，brain（Claude + harness）、hands（sandbox / 工具执行）、session（持久事件日志）三者彻底解耦——harness 崩溃可以 <code>wake(sessionId)</code> 从事件日志恢复，sandbox 变成“可替换的 cattle”而非“舍不得丢的 pet”，凭证也绝不进 sandbox。计费是 token + 会话运行时 <b>$0.08 / 小时</b>（仅按 running 状态计时，idle 不计；另有网页搜索 $10 / 1000 次），并且目前只走 Claude API 直连，不支持 Bedrock / Vertex。</li>
+    </ul>
+
+    <div class="lbl">两种做法，对比一下</div>
+    <div class="compare">
+      <div class="col">
+        <h4>以前：Agent Swarm</h4>
+        <div class="bar-row"><div class="bar-label"><span>AI 自主性</span><span>很高</span></div><div class="bar weak"><i style="width:90%"></i></div></div>
+        <div class="bar-row"><div class="bar-label"><span>可控度</span><span>很低</span></div><div class="bar weak"><i style="width:35%"></i></div></div>
+        <div style="font-size:12.5px;color:#574f48;margin-top:8px">一堆 agent 平权协作、共享 memory、自己写 orchestrator。酷，但不可控，context drift 严重。</div>
+      </div>
+      <div class="col">
+        <h4>现在：Specialist + Managed Runtime</h4>
+        <div class="bar-row"><div class="bar-label"><span>AI 自主性</span><span>适中</span></div><div class="bar"><i style="width:60%"></i></div></div>
+        <div class="bar-row"><div class="bar-label"><span>可控度</span><span>很高</span></div><div class="bar strong"><i style="width:88%"></i></div></div>
+        <div style="font-size:12.5px;color:#574f48;margin-top:8px">一个 lead agent + 若干 context-isolated subagents，各占独立 workspace，平台管 sandbox / state / tracing / approval。</div>
+      </div>
+    </div>
+
+    <div class="lbl">行业证据（说人话 + 术语对照）</div>
+    <table>
+      <tr><th>行业在做什么（术语）</th><th>说人话：对你意味着什么</th></tr>
+      <tr><td>MCP 规范升级为<b>无状态核心</b>（2026-07-28），<code>Mcp-Method</code> / <code>Mcp-Name</code> 头路由</td><td>工具接入标准化（M×N → M+N），而且不用再维护会话亲和性、共享会话存储——普通的负载均衡和网关就能跑</td></tr>
+      <tr><td>Claude Managed Agents 公开 beta：brain / hands / session 解耦，会话运行时 $0.08 / 小时</td><td>你不用自己写调度器、管容器恢复和凭证隔离；按小时付费，idle 不收费</td></tr>
+      <tr><td>Subagent 模式：lead agent + context-isolated workers</td><td>一个主脑管多个专职 AI，各干一段、不互相污染</td></tr>
+      <tr><td>多 agent 的 token 开销显著更高（单 agent 约 chat 的 4×，多 agent 约 15×；agentic coding 极端情况下可达 ~1000×）</td><td>别为“并行”而并行，先算账：省下的人工值不值多烧的 token</td></tr>
+      <tr><td>Human approval gate / human-in-the-loop 成为标配</td><td>你的角色从“写代码”变成“把关的人”：关键操作要你点头</td></tr>
+    </table>
+    <div class="explain"><b>落地建议：</b>不用追新框架。先把“专人专岗 + context isolation”做好（参考 Ⅱ、Ⅲ、Ⅴ），等 managed runtime 能力成熟了再往上叠——这是最稳的路径，也和 Kieran 的路线一致。</div>
+    <div class="src"><b>数据口径：</b>token 倍数来自 Anthropic 公开研究与官方文档（subagent 约 4–7×、lead+subagent 最高约 15×），不同任务差异大，仅作量级参考。</div>
+  </div>
+
+  <!-- Ⅶ -->
+  <div class="card">
+    <div class="tag">Ⅶ 30 分钟上手（照着做就行）</div>
+    <h3>把你的文件夹变成“专家 AI”</h3>
+    <p class="lead">大白话：只要你会建文件夹、会写文档，今天就能开始。专业地说：你要创建一个带 <b>CLAUDE.md 的 workspace</b>，并通过 <b>scoped permissions</b> 把它变成一个 <b>context-isolated specialist agent</b>。</p>
+
+    <div class="lbl">四步走</div>
+    <div class="step-ring">
+      <div class="step">① 写岗位说明<br><small>新建 CLAUDE.md</small></div>
+      <div class="step">② 开两个工位<br><small>worktree：人一个、AI 一个</small></div>
+      <div class="step">③ 限权<br><small>先给 read-only</small></div>
+      <div class="step">④ 把关<br><small>approval gate：改数据前你同意</small></div>
+    </div>
+
+    <div class="lbl">第 ① 步：先跑 /init，再补你自己的约定（CLAUDE.md）</div>
+    <div class="plain">在终端里对项目跑一次 <code>/init</code>——Claude Code 会自己扫一遍你的代码库，自动生成一份 CLAUDE.md 草稿（构建命令、测试约定、项目规范都帮你推断出来了）。你只需要<b>往上补它推断不出来的部分</b>：
+      <br>· <b>你是谁（role）</b>：比如“你是这个项目的开发助手”
+      <br>· <b>你管什么（scope）</b>：比如“只管前端页面和组件”
+      <br>· <b>你不能做什么（guardrails）</b>：比如“不能改数据库、不能部署”
+      <br>· <b>常用命令（workflow）</b>：比如“跑测试用 npm test，启动用 npm run dev”
+    </div>
+    <div class="explain"><b>关键：</b>别从零写，也别抄别人的模板。<code>/init</code> 负责它能看出来的部分，你的规则负责只有你才知道的部分——比如团队的代码风格、历史踩过的坑、哪些是禁区。这也是 <b>context engineering</b> 的核心：<b>精心策划模型看到的内容，而不是堆一堆泛泛的 prompt。</b>（关于 CLAUDE.md 的长度、指令怎么写才有效、Skills 怎么按需加载，见 Ⅰ。）</div>
+
+    <div class="lbl">第 ② 步：开两个工位（worktree / branch）</div>
+    <ul class="do">
+      <li>一份你自己写代码用，一份交给 AI 跑。两边都改同一个项目，但各改各的——这就是最朴素的 <b>context isolation</b>。</li>
+      <li>这样你能清楚看到：你在哪一步拖慢了进度、哪一步不敢放手给 AI、哪一步 AI 做得比你好。</li>
+    </ul>
+
+    <div class="lbl">第 ③ 步：只给只读权限（scoped / read-only）</div>
+    <ul class="do">
+      <li>一开始只让 AI “看”和“跑测试”，别让它删东西、发消息、改数据。</li>
+      <li>等它连续做对十几次，再按最小必要原则开放一点点写权限。</li>
+    </ul>
+    <ul class="dont">
+      <li>别一上来就把生产数据库密码、支付密钥、API token 丢给 AI——权限给小，出错代价才小。</li>
+    </ul>
+
+    <div class="lbl">第 ④ 步：把“改数据 / 上线”留给你自己（human approval gate）</div>
+    <div class="plain">删数据、发外邮、部署上线、改配置——这些动作一定让你手动确认。你当“守门员”，AI 当“运动员”。这就是 <b>human-in-the-loop</b>。</div>
+
+    <div class="lbl">想更进一步：让 AI 从“看文件”到“做实事”（三层栈）</div>
+    <div class="stack">
+      <div class="layer"><b>① Context Layer（上下文层）</b><small>CLAUDE.md + 项目文档 + 代码 + 故障记录（postmortems）——它靠这个“上岗”，也是你累积最久的资产</small></div>
+      <div class="layer"><b>② Tools Layer（工具层）</b><small>通过 MCP servers 接上代码仓库、数据库（只读）、日历、浏览器——让它“动手”，每个 tool 都带 scope</small></div>
+      <div class="layer"><b>③ Runtime Layer（执行层）</b><small>用托管运行时（managed runtime）或本地守护进程跑它，全程 tracing 留痕、关键动作走 approval gate</small></div>
+    </div>
+    <div class="expert"><b>专家视角：</b>文件夹即 agent 的红利不在“多”，而在“上下文资产可累积”。今天写的 CLAUDE.md，三个月后就是别人无法复制的壁垒。</div>
+  </div>
+</div>
+</body>
+</html>

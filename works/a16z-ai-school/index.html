@@ -1,0 +1,340 @@
+<!doctype html>
+<html lang="zh">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>为什么 a16z 要为 AI 时代建一所新学校</title>
+<style>
+:root{
+  --bg:#F3EEE7; --card:#FFFDF9; --ink:#2B2723; --muted:#7A7068; --line:#E2DCD2;
+  --accent:#7A8B7A; --accent-soft:#E9EDE8;
+  --warn:#A98A5B; --warn-soft:#F3EDE2;
+  --good:#6E8E9A; --good-soft:#E8EEF0;
+  --ai:#8A7BA8; --ai-soft:#EFECF6;
+  --bad:#A85B5B; --bad-soft:#F3E6E6;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);
+  font:15px/1.7 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"PingFang SC","Microsoft YaHei",sans-serif}
+.wrap{max-width:880px;margin:0 auto;padding:34px 22px 90px}
+header{border-bottom:1px solid var(--line);padding-bottom:18px;margin-bottom:20px}
+h1{font-size:25px;margin:0 0 6px;line-height:1.35}
+.sub{color:var(--muted);font-size:13px}
+.brief{background:var(--card);border:1px solid var(--line);border-left:4px solid var(--accent);
+  border-radius:12px;padding:15px 18px;font-size:14.5px;color:#4a443e;margin-bottom:20px}
+.brief b{color:var(--ink)}
+.arc{background:var(--ai-soft);border:1px solid #DCD6EA;border-radius:12px;padding:16px 18px;margin-bottom:26px}
+.arc .lab{font-size:11px;letter-spacing:.6px;color:#fff;background:var(--ai);border-radius:6px;padding:2px 9px}
+.arc h2{margin:8px 0 6px;font-size:17px}
+.arc p{margin:4px 0;font-size:14px;color:#3f3b4d}
+.chain{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin-top:12px;font-size:13px;color:#4a443e}
+.chain b{color:var(--ink)}
+.arrow{color:var(--muted)}
+.part{display:flex;align-items:center;gap:10px;margin:30px 0 4px}
+.num{width:26px;height:26px;border-radius:8px;color:#fff;font-size:13px;font-weight:600;
+  display:flex;align-items:center;justify-content:center;flex:0 0 auto}
+.p1{background:var(--accent)} .p2{background:var(--warn)} .p3{background:var(--good)} .p4{background:var(--ai)}
+.pitch{font-size:13px;color:var(--muted);margin:0 0 14px}
+.h2{font-size:19px;margin:2px 0 10px}
+.model{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:16px 18px;margin-bottom:10px}
+.model h4{margin:0 0 2px;font-size:16px}
+.model .en{color:var(--muted);font-size:12.5px;font-weight:400}
+.model p{margin:6px 0;font-size:14px;color:#4a443e}
+.quote{font-size:13.5px;color:#574f48;border-left:3px solid var(--line);padding-left:12px;margin:8px 0}
+.use{background:var(--accent-soft);border-radius:8px;padding:8px 12px;font-size:13px;margin-top:8px}
+.ai{background:#F7F6F2;border:1px solid #E6E2DA;border-left:3px solid var(--ai);
+  border-radius:8px;padding:8px 12px;margin-top:10px;font-size:13.3px}
+.ai .tag{display:inline-block;font-size:10.5px;letter-spacing:.5px;color:#fff;background:var(--ai);
+  border-radius:6px;padding:1px 8px;margin-bottom:6px}
+.ai .lbl{display:inline-block;font-size:11px;letter-spacing:.4px;color:var(--muted);
+  text-transform:uppercase;width:66px;flex:0 0 auto}
+.ai .row{display:flex;gap:6px;line-height:1.65}
+.ai .now{font-weight:600;color:#3d3850}
+.ai .do{color:#4a443e}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:14px 0}
+.box{border-radius:10px;padding:13px 15px;border:1px solid var(--line);font-size:13.5px}
+.box.ok{background:var(--good-soft);border-left:4px solid var(--good)}
+.box.bad{background:var(--bad-soft);border-left:4px solid var(--bad)}
+.box h5{margin:0 0 5px;font-size:14px}
+.box p{margin:3px 0;color:#4a443e}
+.h17{background:#FBFCFD;border:1px solid var(--accent);border-left:4px solid var(--accent);
+  border-radius:10px;padding:15px 18px;margin:14px 0}
+.h17 .tag{font-size:10.5px;letter-spacing:.6px;color:var(--accent);text-transform:uppercase}
+.h17 h4{margin:4px 0 6px;font-size:16px}
+.h17 p{margin:5px 0;font-size:14px;color:#3f464b}
+.lattice{background:var(--accent-soft);border-left:4px solid var(--accent);border-radius:10px;
+  padding:13px 16px;font-size:14px;margin-top:12px;color:#3a4539}
+.warnbox{background:var(--warn-soft);border-left:4px solid var(--warn);border-radius:10px;
+  padding:13px 16px;font-size:13.5px;color:#5a4a32;margin-top:14px}
+.warnbox b{color:#4a3c26}
+footer{border-top:1px solid var(--line);margin-top:32px;padding-top:14px;font-size:12.5px;color:var(--muted)}
+ul{margin:8px 0 4px 20px;padding:0}
+li{margin:4px 0}
+.partners{display:flex;flex-wrap:wrap;gap:7px;margin:10px 0}
+.partners span{background:var(--card);border:1px solid var(--line);border-radius:999px;
+  padding:3px 11px;font-size:12.5px;color:#4a443e}
+table{width:100%;border-collapse:collapse;margin:12px 0;font-size:13.3px}
+th,td{border:1px solid var(--line);padding:8px 10px;text-align:left;vertical-align:top}
+th{background:var(--accent-soft);font-weight:600;color:#3a4539}
+tr:nth-child(even) td{background:#FAF8F4}
+@media(max-width:640px){
+  .grid2{grid-template-columns:1fr}
+  .ai .row{flex-direction:column;gap:2px}
+  .ai .lbl{width:auto}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <h1>为什么 a16z 要为 AI 时代建一所新学校</h1>
+  <div class="sub">The a16z Show · Ben Horowitz × Gagan Biyani × Erik Torenberg · 2026-09-22</div>
+</header>
+
+<div class="brief">
+  <b>一句话：</b>Andreessen Horowitz 宣布创办 <b>Horowitz and Andreessen Academy（HAA）</b>，
+  一所位于旧金山、面向"已经知道自己想 build"的高中毕业生、<b>一年制、首届免学费、不发学位</b>的学校。
+  它的赌注是：工业时代那套培养体系，装不下 AI 时代要的技能——判断力、人、在压力下的决策。
+  重点不是取代大学，而是<b>换一条路径</b>。
+</div>
+
+<div class="arc">
+  <span class="lab">全篇主轴</span>
+  <h2>这不是"办学校"，是"重新设计教育的一切"</h2>
+  <p>Ben 的核心判断：AI 对就业的冲击，量级相当于工业革命对农业社会。为工业革命设计出来的训练方式，不会自动适配 AI 革命——总得有人先试。Gagan 的话更直接：<b>"We're building a new school for the AI era, and that means redesigning everything."</b></p>
+  <div class="chain">
+    <b>旧假设会过期</b> <span class="arrow">→</span>
+    <b>课堂教不出判断力</b> <span class="arrow">→</span>
+    <b>所以改三件事：学什么 / 在哪学 / 怎么衡量</b> <span class="arrow">→</span>
+    <b>让判断力和人成为新护城河</b>
+  </div>
+</div>
+
+<!-- ============ PART 1 ============ -->
+<div class="part"><span class="num p1">1</span><h2 class="h2">为什么必须重建</h2></div>
+<p class="pitch">三位嘉宾认为大学不是"错了"，而是<b>它服务的对象和时代都变了</b>。</p>
+
+<div class="model">
+  <h4>大学服务学者，不服务要干活的人 <span class="en">College works for scholars, not for builders</span></h4>
+  <p>Ben 的区分很干脆：想当学者、要读博的人，四年制大学仍然是正解。但 18 岁就想进公司或创业的人，需要的训练完全不同。</p>
+  <div class="quote">"Everything that we've built to train you was built for a world that is soon to no longer exist." — Ben Horowitz</div>
+  <div class="use">用法：先问"你是想研究，还是想做出来"，再决定要不要走传统四年。</div>
+  <div class="ai">
+    <span class="tag">AI · 升级</span>
+    <div class="row"><span class="lbl">原文假设</span><span>知识由课堂单向输送，年限和学分是标尺。</span></div>
+    <div class="row"><span class="lbl">现在</span><span class="now">知识获取变便宜，稀缺的变成"能用知识做出判断"；年限不再是能力的代理变量。</span></div>
+    <div class="row"><span class="lbl">做</span><span class="do">把"产出过什么"当入学门槛，而不是把"学过多少"当训练目标。</span></div>
+  </div>
+</div>
+
+<div class="model">
+  <h4>学历是一个 bundle，拆不开所以难替代 <span class="en">The bundle problem</span></h4>
+  <p>Gagan 解释了为什么之前的在线教育创业都失败：大学卖的不是"知识"，是<b>知识 + 身份 + 文凭 + 社交</b>四件套，必须整套复制才有竞争力。</p>
+  <div class="use">用法：任何"替代大学"的方案，都得说明自己怎么把社交和身份这两件一起交付。</div>
+  <div class="ai">
+    <span class="tag">AI · 改写</span>
+    <div class="row"><span class="lbl">原文假设</span><span>文凭 = 凭证 + 社交 + 身份，三者捆绑。</span></div>
+    <div class="row"><span class="lbl">现在</span><span class="now">凭证部分被 AI 稀释（会写不等于懂），但身份和社交反而更稀缺、更值钱。</span></div>
+    <div class="row"><span class="lbl">做</span><span class="do">把"密集的同龄人网络 + 真实工作场景"做成核心产品，不试图复制课堂。</span></div>
+  </div>
+</div>
+
+<div class="model">
+  <h4>这是人类历史上最该年轻的时刻 <span class="en">The best time in history to be 18</span></h4>
+  <p>Ben 把当下比作爱迪生、福特的年代：工具强大到，年轻人能直接攻击那些"本来要等三十年资历才轮得到你"的问题。AI 把人从屏幕上解放出来，<b>激励同伴这类"人的能力"会变得极贵</b>。</p>
+  <div class="quote">"This should be the greatest time in the history of humanity to be young." — Ben Horowitz</div>
+  <div class="use">用法：判断时机别看失业率，看"一个新人在这件事上有没有工具优势"。</div>
+  <div class="ai">
+    <span class="tag">AI · 升级</span>
+    <div class="row"><span class="lbl">原文假设</span><span>资历和经验是进入高难度问题的门票。</span></div>
+    <div class="row"><span class="lbl">现在</span><span class="now">工具抹平了入门门槛，经验的价值从"知道怎么做"转向"知道该做什么、敢不敢担"。</span></div>
+    <div class="row"><span class="lbl">做</span><span class="do">给 18 岁的人真实责任 + 真实失败代价，而不是更多课程。</span></div>
+  </div>
+</div>
+
+<!-- ============ PART 2 ============ -->
+<div class="part"><span class="num p2">2</span><h2 class="h2">怎么学：从"学关于做的知识"到"做本身"</h2></div>
+<p class="pitch">课程极短、没有考试和作业，75–80% 的时间花在学生自己的项目上。</p>
+
+<div class="model">
+  <h4>Pursuits · 教育的核心单元 <span class="en">Build something, not study about building</span></h4>
+  <p>学生自己选：创业想法、研究课题、技术项目，甚至一个"兔子洞"。学院不告诉学生该做什么，而是逼他设一个大胆目标，并对结果有<b>extreme ownership</b>。想去日本待三周验证一个假设？学院帮你出钱、帮你牵线。</p>
+  <div class="quote">"Education is not the filling of a bucket, but the lighting of a fire." — 引自叶芝（Erik 在节目中引用）</div>
+  <div class="use">用法：项目选题看"它有没有让你对结果负全责"，而不是看它难不难看。</div>
+  <div class="ai">
+    <span class="tag">AI · 升级</span>
+    <div class="row"><span class="lbl">原文假设</span><span>掌握知识 = 学会，作业是掌握的证据。</span></div>
+    <div class="row"><span class="lbl">现在</span><span class="now">AI 会做作业，所以"做完作业"不再是学习的证据；能独立选题、扛住后果才算。</span></div>
+    <div class="row"><span class="lbl">做</span><span class="do">把"自主权"当成要训练的能力本身，而不是当成教学的前置条件。</span></div>
+  </div>
+</div>
+
+<div class="model">
+  <h4>Courses · 两天的课，由教材里的人来教 <span class="en">2 days to 4 weeks, taught by practitioners</span></h4>
+  <p>课程极短、高密度：AI 推理工程、AI 系统、创始人式销售、谈判、讲故事、数字计算史（1940–2025）、融资与创业形成。老师是 Sam Altman、Jensen Huang、Naval Ravikant、Marc Andreessen 这类"教材里写到的人"，而不是有教学资格证的人。</p>
+  <div class="use">用法：短课的价值在"方向和引荐"，不在"知识密度"——学生带着自己的项目来问，才值。</div>
+  <div class="ai">
+    <span class="tag">AI · 改写</span>
+    <div class="row"><span class="lbl">原文假设</span><span>教师 = 知识最权威的那个人。</span></div>
+    <div class="row"><span class="lbl">现在</span><span class="now">知识 AI 能讲，老师真正的稀缺价值是判断力 + 人脉 + 见过失败。</span></div>
+    <div class="row"><span class="lbl">做</span><span class="do">请"做过这件事"的人来教，让他回答"你这个项目该往哪走"。</span></div>
+  </div>
+</div>
+
+<div class="model">
+  <h4>Co-ops · 在公司里学 <span class="en">Learn by working</span></h4>
+  <p>不是实习，是沉浸式轮岗：可以在一家公司深挖，也可以自己做 mini rotational program，试不同阶段、不同角色。学院目标是每个学生至少三个月全职在公司里。</p>
+  <div class="use">用法：想清楚自己适合什么，最快的办法是试三种不同的组织形态，而不是多读一本书。</div>
+  <div class="ai">
+    <span class="tag">AI · 升级</span>
+    <div class="row"><span class="lbl">原文假设</span><span>工作经验 = 年限，靠时间换。</span></div>
+    <div class="row"><span class="lbl">现在</span><span class="now">AI 让新人第一年就能产出，公司更愿给 18 岁真实活干；轮岗窗口变短、信息更密。</span></div>
+    <div class="row"><span class="lbl">做</span><span class="do">把 co-op 排进课程主线，且允许学生跨公司、跨阶段自选路径。</span></div>
+  </div>
+</div>
+
+<div class="model">
+  <h4>AI 工具要用，但不能替你写故事 <span class="en">AI-native, but proof of work is yours</span></h4>
+  <p>学院是 AI-optimistic，明确要"AI boomers"而不是 doomers，给学生算力去 build。但申请时：<b>可以用 AI 跑得更快，但不能让 AI 替你写你的故事</b>。</p>
+  <div class="use">用法：区分"AI 帮你执行"和"AI 替你拥有"——前者是赋能，后者是造假。</div>
+  <div class="ai">
+    <span class="tag">AI · 改写</span>
+    <div class="row"><span class="lbl">原文假设</span><span>考试能区分谁学会了。</span></div>
+    <div class="row"><span class="lbl">现在</span><span class="now">AI 让考试失效，区分度转到"无法伪造的真实产出 + 你为什么这么做"。</span></div>
+    <div class="row"><span class="lbl">做</span><span class="do">用作品集（portfolio）和现场追问动机，代替考试和 GPA。</span></div>
+  </div>
+</div>
+
+<div class="model">
+  <h4>不用 AI 教的最难问题 <span class="en">Make problems hard enough that you need AI</span></h4>
+  <p>节目里提到斯坦福 Dan Boneh 的观点：禁 AI 没用，应该把问题设计得足够难，以至于<b>必须用 AI 才能解决</b>。另有一门课叫 <i>The Geometry of Luck</i>（幸运的几何学）——研究怎么设计人生，让好运更容易发生。</p>
+  <div class="use">用法：出题思路从"不许用工具"改成"工具给你了，问题够不够硬"。</div>
+  <div class="ai">
+    <span class="tag">AI · 改写</span>
+    <div class="row"><span class="lbl">原文假设</span><span>闭卷能测真能力。</span></div>
+    <div class="row"><span class="lbl">现在</span><span class="now">开卷都未必够，因为问题本身要够大；考的是"在工具之上怎么组织"。</span></div>
+    <div class="row"><span class="lbl">做</span><span class="do">把"判断力"和"运气设计"这类软课题当正课，而非课外活动。</span></div>
+  </div>
+</div>
+
+<!-- ============ PART 3 ============ -->
+<div class="part"><span class="num p3">3</span><h2 class="h2">怎么衡量：proof of work</h2></div>
+<p class="pitch">没有成绩、没有作业、没有学位。入学看"你做过什么"，毕业看"你成了什么样"。</p>
+
+<div class="model">
+  <h4>入学问的是"You did what?" <span class="en">Admissions by proof of work</span></h4>
+  <p>申请不交推荐信（第一轮），交：作品集链接、短文、一段视频，成绩单和标化成绩只存档。筛选的是 <b>agency</b>——已经在动、会顺着兴趣行动的人。且不要求会写代码：build 软件、产品、研究、社群、受众、活动，都算。</p>
+  <div class="use">用法：招生看"动能"而不是"分数"，所以材料要呈现"你主动做了什么、为什么"。</div>
+  <div class="ai">
+    <span class="tag">AI · 升级</span>
+    <div class="row"><span class="lbl">原文假设</span><span>成绩是能力的最佳代理变量。</span></div>
+    <div class="row"><span class="lbl">现在</span><span class="now">GPA 可刷、可借 AI，而"已经做出过什么"的代理变量更抗稀释。</span></div>
+    <div class="row"><span class="lbl">做</span><span class="do">把"没有外界催促也把事做完"当成核心筛选标准。</span></div>
+  </div>
+</div>
+
+<div class="model">
+  <h4>失败要产出"赚来的秘密" <span class="en">Failure that earns a secret</span></h4>
+  <p>Ben 修正了硅谷那句陈词滥调：失败本身不值钱，<b>只有失败能换来"这件事为什么难"的 earned secret</b>，才算有价值。Gagan 补了一条：还没有十亿美金想法的人，不要急着停在百万美金想法上，<b>继续探索</b>。</p>
+  <div class="quote">"It's critical for young people who don't have that billion dollar idea to not settle for the million dollar idea and instead go and explore more." — Gagan Biyani</div>
+  <div class="use">用法：复盘只看一件事——这次失败换来了什么"别人要付钱才能知道"的判断。</div>
+  <div class="ai">
+    <span class="tag">AI · 升级</span>
+    <div class="row"><span class="lbl">原文假设</span><span>快速试错越多越好。</span></div>
+    <div class="row"><span class="lbl">现在</span><span class="now">试错成本趋零后，"试得多"不再稀缺；稀缺的是"从失败里抽出可复用判断"。</span></div>
+    <div class="row"><span class="lbl">做</span><span class="do">每个项目结束强制做一次"earned secret"答辩，而不是庆祝失败本身。</span></div>
+  </div>
+</div>
+
+<div class="model">
+  <h4>判断力只能在做中学 <span class="en">Judgment under pressure</span></h4>
+  <p>Ben 用 NFL 四分卫类比：读 quarterbacking 的书，和真有人在冲你时做决定，是两件事。领导力、决策、冲突解决，只能在真项目里练——要让学生<b>感受到"犹豫的代价"</b>。</p>
+  <div class="use">用法：判断力的训练场是"有后果的现场"，课堂只能做预习。</div>
+  <div class="ai">
+    <span class="tag">AI · 反而更重要</span>
+    <div class="row"><span class="lbl">原文假设</span><span>经验靠年限积累，课堂只能教知识。</span></div>
+    <div class="row"><span class="lbl">现在</span><span class="now">AI 能替你做分析，但不能替你承担判断的后果——判断力成了最后一条护城河。</span></div>
+    <div class="row"><span class="lbl">做</span><span class="do">设计"压力低、但后果真实"的练习场，让学生反复做决定并看结果。</span></div>
+  </div>
+</div>
+
+<div class="model">
+  <h4>人靠渗透学，不靠上课学 <span class="en">People skills are caught, not taught</span></h4>
+  <p>怎么激励同伴、怎么处理冲突、怎么建立信任——这类能力靠 osmosis（渗透），靠浸在同类密度高的人里。学院因此押注三件事：旧金山的密度、支持性的同龄网络、项目制课程。</p>
+  <div class="use">用法：想提升"人的能力"，最有效的方法是换环境，不是加课表。</div>
+  <div class="ai">
+    <span class="tag">AI · 反而更重要</span>
+    <div class="row"><span class="lbl">原文假设</span><span>沟通能力是加分项，主要靠个人天赋。</span></div>
+    <div class="row"><span class="lbl">现在</span><span class="now">AI 接管屏幕后的产出，面对面的协作、激励、信任变成最贵的技能。</span></div>
+    <div class="row"><span class="lbl">做</span><span class="do">把社交和团队环境当"教学设施"，而不是课余福利。</span></div>
+  </div>
+</div>
+
+<!-- ============ PART 4 ============ -->
+<div class="part"><span class="num p4">4</span><h2 class="h2">AI 时代改写：学校本身也成了产品</h2></div>
+<p class="pitch">学校不是慈善项目，是一个 for-profit 产品。这个设计选择本身就是它最重要的判断之一。</p>
+
+<div class="grid2">
+  <div class="box ok">
+    <h5>✓ 对齐的设计</h5>
+    <p>营利结构让学院<b>只有一个客户：学生</b>（不是捐赠人、校友或家长）。毕业生成才直接驱动品牌飞轮。</p>
+  </div>
+  <div class="box bad">
+    <h5>✕ 必须正视的缺口</h5>
+    <p>无认证、无学位、不收联邦助学贷款、<b>不保证工作或带薪实习</b>；合作伙伴各家的投入不一，并非每家都承诺录用。</p>
+  </div>
+</div>
+
+<div class="model">
+  <h4>为什么是旧金山，不是随便哪个城市 <span class="en">San Francisco or nowhere</span></h4>
+  <p>这里是全球科技人才密度最高的地方，也是高信任、容忍失败的文化所在地。学院本身是 a16z 网络的具象化：1600 家被投公司，其中 80%+ 在湾区；单 a16z 组合就有 19,000+ 岗位、跨 850+ 家公司。学院是<b>独立公司</b>，不是 a16z 的投资标的。</p>
+  <div class="use">用法：学校选址的本质是"能否形成密度"——同样的课程换个城市，产出完全不同。</div>
+  <div class="ai">
+    <span class="tag">AI · 改写</span>
+    <div class="row"><span class="lbl">原文假设</span><span>好老师 + 好课程 = 好学校。</span></div>
+    <div class="row"><span class="lbl">现在</span><span class="now">人才密度、可信赖的网络、失败容忍度，这些"环境资产"比师资更难复制，也更能决定产出。</span></div>
+    <div class="row"><span class="lbl">做</span><span class="do">把地理位置和合作网络当成核心 curriculum，而非配套设施。</span></div>
+  </div>
+</div>
+
+<div class="h17">
+  <div class="tag">New · 新增模型</div>
+  <h4>环境即课程（Environment as Curriculum）</h4>
+  <p>当知识可以被 AI 随时调取，学校的差异化不再来自"教什么"，而来自它把学生放进<b>什么样的人、什么样的失败、什么样的机会</b>旁边。课程表只是载体，密度、信任和后果才是教学内容。</p>
+</div>
+
+<div class="h17">
+  <div class="tag">New · 落地清单</div>
+  <h4>怎么判断一所"新学校"是不是真做对了</h4>
+  <ul>
+    <li>入学看 proof of work，还是看 GPA / 标化</li>
+    <li>项目里学生有没有真后果（预算、承诺、客户），而不只是"体验"</li>
+    <li>老师是"做过这件事的人"，还是"会教这件事的人"</li>
+    <li>人是不是被当课程设计的一部分（密度、团队、冲突），而非课后活动</li>
+    <li>有没有把"判断力 + 失败复盘"做成必修，而非靠学生自己悟</li>
+    <li>经济模型里，谁是唯一客户（学生、雇主，还是投资人）</li>
+  </ul>
+</div>
+
+<div class="lattice">
+  <b>三位嘉宾最终的落点：</b>学院不取代大学，它只给"已经知道自己想 build"的人另一条路。
+  Ben 甚至说 <b>"Please, Harvard, copy us."</b>——他希望的是这个模式被复制，而不是证明旧体系错了。
+  五年的成功标准：毕业生有热爱的事业、有意思的公司被做出来、学院学会什么有效并扩到更多人。
+</div>
+
+<div class="warnbox">
+  <b>来源口径：</b>本期为 2026-09-22 的对谈，部分表述属嘉宾主观判断，非实证研究结论。
+  关键数据（首期约 50 人、2027 年 9 月开学、一年免学费、$42M 融资、每家学生 $50,000+ 算力额度与 $5,000 探索预算）
+  来自 a16z 官方公告及 Fortune / Bloomberg / TechCrunch 报道；<b>2028 年起两年制学费约 $60,000–90,000/年</b>为规划口径，
+  尚未获批、亦未开始招生。学位、助学贷款与就业均不保证——以上信息可能随监管与项目推进变化，请以其官网最新公告为准。
+</div>
+
+<footer>
+  The a16z Show · Ben Horowitz, Gagan Biyani, Erik Torenberg · 本文为对谈要点解读，非逐字转录。
+  a16z 声明：本页内容仅供信息参考，不构成法律、税务、投资或证券建议。
+</footer>
+
+</div>
+</body>
+</html>

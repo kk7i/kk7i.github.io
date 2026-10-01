@@ -1,0 +1,1722 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Jev：8 个真实用例 — 从输入到结构化决策的完整拆解</title>
+  <style>
+    :root {
+      --color-bg: #f7f8fc;
+      --color-surface: #ffffff;
+      --color-surface-alt: #f8fafc;
+      --color-border: #e8ecf1;
+      --color-border-strong: #d1d9e6;
+      --color-text: #1a202c;
+      --color-text-secondary: #4a5568;
+      --color-text-tertiary: #718096;
+      --color-primary: #5b5bd6;
+      --color-primary-light: #eef0ff;
+      --color-primary-dark: #4348b8;
+      --color-accent: #8b5cf6;
+      --color-success: #059669;
+      --color-warning: #d97706;
+      --color-warning-light: #fffbeb;
+      --color-info: #2563eb;
+      --color-info-light: #eff6ff;
+      --radius-sm: 8px;
+      --radius-md: 14px;
+      --radius-lg: 20px;
+      --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.04);
+      --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.05);
+      --shadow-lg: 0 12px 32px rgba(0, 0, 0, 0.07);
+      --transition: 0.18s ease;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans SC", sans-serif;
+      background: var(--color-bg);
+      color: var(--color-text);
+      line-height: 1.65;
+      padding: 2rem 1rem;
+      display: flex;
+      justify-content: center;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .container {
+      max-width: 880px;
+      width: 100%;
+      background: var(--color-surface);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-lg);
+      padding: 2.75rem 2.5rem;
+      overflow-x: hidden;
+    }
+
+    /* ===== 头部 ===== */
+    .header { margin-bottom: 2.25rem; }
+
+    .header-top {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 0.6rem 1rem;
+      margin-bottom: 1rem;
+    }
+
+    .badge {
+      display: inline-block;
+      background: var(--color-primary-light);
+      color: var(--color-primary-dark);
+      font-size: 0.72rem;
+      font-weight: 700;
+      padding: 0.25rem 0.7rem;
+      border-radius: 100px;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+
+    .header h1 {
+      font-size: 2.05rem;
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      color: #0f172a;
+      line-height: 1.2;
+      margin-bottom: 0.6rem;
+    }
+
+    .header .subhead {
+      font-size: 0.98rem;
+      color: var(--color-text-tertiary);
+      font-weight: 400;
+      line-height: 1.6;
+      max-width: 700px;
+      margin-bottom: 1.1rem;
+    }
+
+    .header .meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.75rem 1.75rem;
+      font-size: 0.85rem;
+      color: var(--color-text-secondary);
+      padding-top: 1rem;
+      border-top: 1px solid var(--color-border);
+    }
+
+    /* ===== 核心洞察 ===== */
+    .insight-card {
+      background: linear-gradient(135deg, #fafbff 0%, #f4f6ff 100%);
+      border: 1px solid #e0e4f5;
+      border-radius: var(--radius-md);
+      padding: 1.5rem 1.75rem;
+      margin-bottom: 2rem;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .insight-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0;
+      width: 4px; height: 100%;
+      background: linear-gradient(180deg, var(--color-primary), var(--color-accent));
+    }
+
+    .insight-card h2 {
+      font-size: 1.08rem;
+      font-weight: 700;
+      color: var(--color-primary-dark);
+      margin-bottom: 0.6rem;
+    }
+
+    .insight-card p {
+      font-size: 0.94rem;
+      color: var(--color-text-secondary);
+      line-height: 1.7;
+    }
+
+    .insight-card p + p { margin-top: 0.55rem; }
+
+    .insight-card strong { color: var(--color-text); font-weight: 600; }
+
+    /* ===== 概念解释 ===== */
+    .concept-box {
+      background: #ffffff;
+      border: 1.5px solid #e0e4f5;
+      border-radius: var(--radius-md);
+      padding: 1.75rem 1.75rem 1.5rem;
+      margin-bottom: 2.5rem;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .concept-box > h2 {
+      font-size: 1.2rem;
+      font-weight: 800;
+      color: #0f172a;
+      margin-bottom: 0.4rem;
+      letter-spacing: -0.01em;
+    }
+
+    .concept-box > .lead {
+      font-size: 0.9rem;
+      color: var(--color-text-tertiary);
+      margin-bottom: 1.35rem;
+    }
+
+    .compare-demo {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .demo-side {
+      border-radius: var(--radius-sm);
+      padding: 1.1rem 1.15rem;
+      font-size: 0.82rem;
+      line-height: 1.55;
+    }
+
+    .demo-side.bad { background: #fef2f2; border: 1px solid #fecaca; }
+    .demo-side.good { background: #f0fdf4; border: 1px solid #bbf7d0; }
+
+    .demo-side h4 {
+      font-size: 0.78rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: 0.7rem;
+    }
+
+    .demo-side.bad h4 { color: #b91c1c; }
+    .demo-side.good h4 { color: #15803d; }
+
+    .demo-line {
+      padding: 0.5rem 0.7rem;
+      border-radius: 6px;
+      margin-bottom: 0.4rem;
+      font-size: 0.78rem;
+      word-break: break-word;
+    }
+
+    .demo-line.label {
+      background: rgba(0, 0, 0, 0.04);
+      font-weight: 600;
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      color: var(--color-text-tertiary);
+    }
+
+    .demo-line.output-bad {
+      background: #ffffff;
+      border: 1px solid #fecaca;
+      color: #7f1d1d;
+      font-family: "SF Mono", Menlo, Consolas, monospace;
+      font-size: 0.74rem;
+    }
+
+    .demo-line.output-good {
+      background: #ffffff;
+      border: 1px solid #bbf7d0;
+      color: #14532d;
+      font-family: "SF Mono", Menlo, Consolas, monospace;
+      font-size: 0.74rem;
+    }
+
+    .demo-arrow {
+      text-align: center;
+      font-size: 0.9rem;
+      color: #cbd5e1;
+      margin: 0.15rem 0;
+      line-height: 1;
+    }
+
+    .concept-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 0.85rem;
+      margin-bottom: 1.35rem;
+    }
+
+    .concept-mini {
+      background: var(--color-surface-alt);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-sm);
+      padding: 0.95rem 1rem;
+    }
+
+    .concept-mini h5 {
+      font-size: 0.85rem;
+      font-weight: 700;
+      color: var(--color-primary-dark);
+      margin-bottom: 0.3rem;
+    }
+
+    .concept-mini p {
+      font-size: 0.78rem;
+      color: var(--color-text-secondary);
+      line-height: 1.55;
+    }
+
+    .calibration-note {
+      background: var(--color-info-light);
+      border: 1px solid #bfdbfe;
+      border-radius: var(--radius-sm);
+      padding: 1rem 1.2rem;
+      font-size: 0.84rem;
+      color: #1e3a8a;
+      line-height: 1.65;
+    }
+
+    .calibration-note strong { color: #1e40af; font-weight: 700; }
+
+    .threshold-table {
+      display: grid;
+      grid-template-columns: auto 1fr;
+      gap: 0.4rem 0.9rem;
+      margin-top: 0.7rem;
+      font-size: 0.8rem;
+    }
+
+    .threshold-table .range {
+      font-weight: 700;
+      font-family: "SF Mono", Menlo, Consolas, monospace;
+      color: #1e40af;
+      white-space: nowrap;
+    }
+
+    .threshold-table .action { color: #1e3a8a; }
+
+    /* ===== 架构决策指引 ===== */
+    .arch-guide {
+      background: #ffffff;
+      border: 1.5px solid #e0e4f5;
+      border-radius: var(--radius-md);
+      padding: 1.75rem 1.75rem 1.5rem;
+      margin-bottom: 2.5rem;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .arch-guide > h2 {
+      font-size: 1.2rem;
+      font-weight: 800;
+      color: #0f172a;
+      margin-bottom: 0.4rem;
+      letter-spacing: -0.01em;
+    }
+
+    .arch-guide > .lead {
+      font-size: 0.9rem;
+      color: var(--color-text-tertiary);
+      margin-bottom: 1.35rem;
+    }
+
+    .arch-flow {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0;
+      margin: 0.5rem 0 0;
+      flex-wrap: wrap;
+    }
+
+    .arch-node {
+      text-align: center;
+      padding: 0.7rem 1rem;
+      border-radius: var(--radius-sm);
+      font-size: 0.78rem;
+      font-weight: 600;
+      min-width: 110px;
+    }
+
+    .arch-node.llm-node {
+      background: #fef3c7;
+      color: #92400e;
+      border: 1px solid #fcd34d;
+    }
+
+    .arch-node.jev-node {
+      background: linear-gradient(135deg, #5b5bd6, #8b5cf6);
+      color: #ffffff;
+      border: 1px solid #7c3aed;
+      box-shadow: 0 2px 10px rgba(91, 91, 214, 0.28);
+    }
+
+    .arch-node.out-node {
+      background: #d1fae5;
+      color: #065f46;
+      border: 1px solid #6ee7b7;
+    }
+
+    .arch-arrow {
+      font-size: 1.1rem;
+      color: #cbd5e1;
+      padding: 0 0.35rem;
+      font-weight: 300;
+    }
+
+    /* ===== 决策流（嵌入 arch-guide） ===== */
+    .pipeline {
+      display: flex;
+      flex-direction: column;
+      gap: 0.25rem;
+      margin-top: 0.5rem;
+    }
+
+    .pipe-stage {
+      display: flex;
+      align-items: center;
+      gap: 0.9rem;
+      padding: 0.8rem 1.1rem;
+      background: var(--color-surface-alt);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-sm);
+    }
+
+    .stage-label {
+      flex-shrink: 0;
+      min-width: 60px;
+      font-size: 0.65rem;
+      font-weight: 800;
+      letter-spacing: 0.07em;
+      text-transform: uppercase;
+      color: var(--color-primary-dark);
+    }
+
+    .stage-content {
+      flex: 1;
+      font-size: 0.83rem;
+      color: var(--color-text-secondary);
+      line-height: 1.5;
+    }
+
+    .stage-content .chip {
+      display: inline-block;
+      font-size: 0.68rem;
+      font-weight: 700;
+      padding: 0.15rem 0.55rem;
+      border-radius: 5px;
+      margin-right: 0.3rem;
+      font-family: "SF Mono", Menlo, Consolas, monospace;
+      letter-spacing: 0;
+    }
+
+    .chip.choice { background: #dbeafe; color: #1e40af; }
+    .chip.score  { background: #ede9fe; color: #6d28d9; }
+    .chip.noul   { background: #fce7f3; color: #9f1239; }
+
+    .pipe-arrow {
+      text-align: center;
+      color: #cbd5e1;
+      font-size: 0.95rem;
+      line-height: 1;
+      padding: 0.1rem 0;
+      user-select: none;
+    }
+
+    .pipe-fork {
+      margin-top: 0.6rem;
+      padding-top: 1.1rem;
+      border-top: 2px dashed #d8dcf0;
+      position: relative;
+    }
+
+    .fork-headline {
+      position: absolute;
+      top: -10px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: #ffffff;
+      padding: 0 0.85rem;
+      font-size: 0.7rem;
+      font-weight: 800;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--color-primary-dark);
+      white-space: nowrap;
+    }
+
+    .fork-headline .fork-sub {
+      font-size: 0.66rem;
+      font-weight: 500;
+      color: var(--color-text-tertiary);
+      text-transform: none;
+      letter-spacing: 0.02em;
+      margin-left: 0.35rem;
+    }
+
+    .fork-branches {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 0.65rem;
+      margin-top: 0.4rem;
+    }
+
+    .branch-path {
+      text-align: center;
+      padding: 0.9rem 0.7rem 0.8rem;
+      border-radius: var(--radius-sm);
+      border: 1.5px solid;
+      display: flex;
+      flex-direction: column;
+      gap: 0.3rem;
+      position: relative;
+    }
+
+    .branch-path::before {
+      content: '';
+      position: absolute;
+      top: -8px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 0;
+      height: 0;
+      border-left: 6px solid transparent;
+      border-right: 6px solid transparent;
+    }
+
+    .branch-path.high {
+      background: #ecfdf5;
+      border-color: #6ee7b7;
+    }
+
+    .branch-path.high::before { border-top: 7px solid #6ee7b7; }
+
+    .branch-path.mid {
+      background: #fffbeb;
+      border-color: #fcd34d;
+    }
+
+    .branch-path.mid::before { border-top: 7px solid #fcd34d; }
+
+    .branch-path.low {
+      background: #fef2f2;
+      border-color: #fca5a5;
+    }
+
+    .branch-path.low::before { border-top: 7px solid #fca5a5; }
+
+    .branch-threshold {
+      font-family: "SF Mono", Menlo, Consolas, monospace;
+      font-size: 0.85rem;
+      font-weight: 800;
+      letter-spacing: -0.01em;
+      line-height: 1.2;
+    }
+
+    .branch-path.high .branch-threshold { color: #065f46; }
+    .branch-path.mid  .branch-threshold { color: #92400e; }
+    .branch-path.low  .branch-threshold { color: #991b1b; }
+
+    .branch-action {
+      font-size: 0.75rem;
+      font-weight: 700;
+      color: var(--color-text);
+      line-height: 1.35;
+    }
+
+    .branch-action small {
+      display: block;
+      font-weight: 400;
+      font-size: 0.69rem;
+      color: var(--color-text-secondary);
+      margin-top: 0.25rem;
+      line-height: 1.5;
+    }
+
+    .cross-cutting {
+      margin-top: 1.25rem;
+      padding: 0.85rem 1.1rem;
+      background: #eef2ff;
+      border: 1px solid #c7d2fe;
+      border-radius: var(--radius-sm);
+      font-size: 0.78rem;
+      color: #3730a3;
+      line-height: 1.6;
+    }
+
+    .cross-cutting strong { color: #312e81; font-weight: 700; }
+
+    .cross-cutting .cc-label {
+      display: inline-block;
+      font-size: 0.62rem;
+      font-weight: 800;
+      letter-spacing: 0.07em;
+      text-transform: uppercase;
+      color: #4c51bf;
+      margin-right: 0.4rem;
+    }
+
+    .arch-guide h3 {
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: #0f172a;
+      margin-bottom: 0.75rem;
+      margin-top: 0.5rem;
+    }
+
+    /* ===== 章节标题 ===== */
+    .section-title {
+      font-size: 1.3rem;
+      font-weight: 800;
+      color: #0f172a;
+      margin: 2.5rem 0 1.25rem;
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      letter-spacing: -0.01em;
+    }
+
+    .section-title .icon { font-size: 1.2rem; }
+
+    /* ===== 用例模块 ===== */
+    .usecase-module {
+      background: #ffffff;
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-md);
+      padding: 1.5rem 1.6rem 1.4rem;
+      margin-bottom: 1.25rem;
+      transition: box-shadow var(--transition), border-color var(--transition);
+    }
+
+    .usecase-module:hover {
+      box-shadow: var(--shadow-md);
+      border-color: var(--color-border-strong);
+    }
+
+    .module-header {
+      display: flex;
+      align-items: center;
+      gap: 0.8rem;
+      margin-bottom: 1.1rem;
+      padding-bottom: 0.9rem;
+      border-bottom: 1px solid var(--color-border);
+    }
+
+    .module-num {
+      flex-shrink: 0;
+      width: 36px;
+      height: 36px;
+      border-radius: 10px;
+      background: linear-gradient(135deg, #5b5bd6, #8b5cf6);
+      color: #ffffff;
+      font-weight: 800;
+      font-size: 0.95rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 2px 8px rgba(91, 91, 214, 0.28);
+    }
+
+    .module-title {
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: #0f172a;
+      flex: 1;
+      line-height: 1.35;
+      letter-spacing: -0.01em;
+    }
+
+    .module-tag {
+      flex-shrink: 0;
+      font-size: 0.7rem;
+      font-weight: 700;
+      padding: 0.28rem 0.7rem;
+      border-radius: 100px;
+      background: var(--color-primary-light);
+      color: var(--color-primary-dark);
+      letter-spacing: 0.02em;
+      white-space: nowrap;
+    }
+
+    .module-body {
+      display: grid;
+      grid-template-columns: 1fr 1.15fr;
+      gap: 1.75rem;
+    }
+
+    .module-story h4,
+    .module-breakdown h4 {
+      font-size: 0.7rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--color-text-tertiary);
+      margin-bottom: 0.55rem;
+    }
+
+    .module-story p {
+      font-size: 0.85rem;
+      color: var(--color-text-secondary);
+      line-height: 1.68;
+      margin-bottom: 0.6rem;
+    }
+
+    .module-story p:last-child { margin-bottom: 0; }
+    .module-story p strong { color: var(--color-text); font-weight: 600; }
+
+    .bd-block {
+      display: flex;
+      flex-direction: column;
+      gap: 0.55rem;
+    }
+
+    .bd-row {
+      display: flex;
+      gap: 0.6rem;
+      align-items: flex-start;
+    }
+
+    .bd-key {
+      flex-shrink: 0;
+      min-width: 48px;
+      font-size: 0.64rem;
+      font-weight: 800;
+      letter-spacing: 0.05em;
+      padding: 0.22rem 0.4rem;
+      border-radius: 5px;
+      text-align: center;
+      margin-top: 0.15rem;
+      text-transform: uppercase;
+    }
+
+    .bd-key.in { background: #dbeafe; color: #1e40af; }
+    .bd-key.space { background: #ede9fe; color: #6d28d9; }
+    .bd-key.out { background: #d1fae5; color: #065f46; }
+
+    .bd-val {
+      font-size: 0.8rem;
+      color: var(--color-text-secondary);
+      line-height: 1.55;
+      word-break: break-word;
+      flex: 1;
+    }
+
+    .bd-val code {
+      font-family: "SF Mono", Menlo, Consolas, monospace;
+      font-size: 0.74rem;
+      background: var(--color-surface-alt);
+      padding: 0.05rem 0.35rem;
+      border-radius: 3px;
+      border: 1px solid var(--color-border);
+      color: #0f172a;
+    }
+
+    .bd-code {
+      display: block;
+      background: #1e293b;
+      color: #e2e8f0;
+      border-radius: 8px;
+      padding: 0.7rem 0.85rem;
+      font-family: "SF Mono", Menlo, Consolas, monospace;
+      font-size: 0.73rem;
+      line-height: 1.65;
+      overflow-x: auto;
+      white-space: pre;
+      margin-top: 0.15rem;
+    }
+
+    .bd-code .k { color: #93c5fd; }
+    .bd-code .s { color: #a5f3a0; }
+    .bd-code .n { color: #fbbf24; }
+
+    .confidence-strategy {
+      margin-top: 0.85rem;
+      padding-top: 0.75rem;
+      border-top: 1px dashed var(--color-border);
+      font-size: 0.76rem;
+      color: var(--color-text-secondary);
+      line-height: 1.6;
+    }
+
+    .confidence-strategy .strategy-label {
+      display: inline-block;
+      font-size: 0.64rem;
+      font-weight: 800;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: var(--color-primary-dark);
+      margin-right: 0.35rem;
+    }
+
+    .confidence-strategy code {
+      font-family: "SF Mono", Menlo, Consolas, monospace;
+      font-size: 0.72rem;
+      background: var(--color-surface-alt);
+      padding: 0.05rem 0.3rem;
+      border-radius: 3px;
+      border: 1px solid var(--color-border);
+      color: #0f172a;
+    }
+
+    .app-notes {
+      margin-top: 0.85rem;
+      padding: 0.85rem 1rem;
+      background: #f0f9ff;
+      border: 1px solid #bae6fd;
+      border-radius: var(--radius-sm);
+      font-size: 0.76rem;
+      color: #0c4a6e;
+      line-height: 1.65;
+    }
+
+    .app-notes .app-label {
+      display: inline-block;
+      font-size: 0.62rem;
+      font-weight: 800;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: #0369a1;
+      margin-bottom: 0.35rem;
+    }
+
+    .app-notes ul { padding-left: 1.1rem; margin: 0.15rem 0 0; }
+    .app-notes li { margin-bottom: 0.25rem; }
+
+    .app-notes code {
+      font-family: "SF Mono", Menlo, Consolas, monospace;
+      font-size: 0.7rem;
+      background: #ffffff;
+      padding: 0.05rem 0.3rem;
+      border-radius: 3px;
+      border: 1px solid #bae6fd;
+      color: #0c4a6e;
+    }
+
+    /* ===== 额外补充 ===== */
+    .extra-note {
+      background: #eef2ff;
+      border: 1px solid #c7d2fe;
+      border-radius: var(--radius-md);
+      padding: 1.15rem 1.35rem;
+      font-size: 0.86rem;
+      color: #3730a3;
+      line-height: 1.65;
+      margin: 1.5rem 0 2rem;
+    }
+
+    .extra-note strong { color: #312e81; font-weight: 700; }
+
+    /* ===== 性能对比 ===== */
+    .benchmark-section {
+      background: var(--color-surface-alt);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-md);
+      padding: 1.75rem 1.75rem 1.5rem;
+      margin: 1.5rem 0 2rem;
+    }
+
+    .benchmark-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 0.8rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .benchmark-stat {
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-sm);
+      padding: 0.9rem 0.8rem;
+      text-align: center;
+    }
+
+    .benchmark-stat .value {
+      font-size: 1.25rem;
+      font-weight: 800;
+      color: var(--color-primary);
+      line-height: 1.2;
+      letter-spacing: -0.02em;
+    }
+
+    .benchmark-stat .label {
+      font-size: 0.72rem;
+      color: var(--color-text-tertiary);
+      font-weight: 500;
+      margin-top: 0.25rem;
+      line-height: 1.4;
+    }
+
+    .compare-bars {
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+    }
+
+    .compare-row {
+      display: flex;
+      align-items: center;
+      gap: 0.9rem;
+    }
+
+    .compare-label {
+      flex: 0 0 110px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: var(--color-text-secondary);
+      text-align: right;
+    }
+
+    .compare-track {
+      flex: 1;
+      height: 28px;
+      background: #eef1f6;
+      border-radius: var(--radius-sm);
+      overflow: hidden;
+      position: relative;
+    }
+
+    .compare-fill {
+      height: 100%;
+      border-radius: var(--radius-sm);
+      display: flex;
+      align-items: center;
+      padding-left: 0.7rem;
+      font-size: 0.72rem;
+      font-weight: 700;
+      color: #ffffff;
+      white-space: nowrap;
+      min-width: 70px;
+    }
+
+    .compare-fill.jev {
+      background: linear-gradient(90deg, #5b5bd6, #8b5cf6);
+    }
+
+    .compare-fill.llm {
+      background: linear-gradient(90deg, #a0aec0, #cbd5e1);
+      color: #2d3748;
+    }
+
+    .compare-fill small {
+      font-weight: 400;
+      opacity: 0.85;
+      margin-left: 0.3rem;
+    }
+
+    .benchmark-footnote {
+      font-size: 0.74rem;
+      color: var(--color-text-tertiary);
+      margin-top: 1rem;
+      line-height: 1.55;
+    }
+
+    /* ===== 局限 ===== */
+    .caveat-box {
+      background: var(--color-warning-light);
+      border: 1px solid #fde68a;
+      border-radius: var(--radius-md);
+      padding: 1.15rem 1.35rem;
+      font-size: 0.86rem;
+      color: #92400e;
+      line-height: 1.65;
+      margin-top: 1.5rem;
+    }
+
+    .caveat-box strong { color: #78350f; font-weight: 700; }
+
+    .caveat-box ul { margin-top: 0.5rem; padding-left: 1.2rem; }
+    .caveat-box li { margin-bottom: 0.3rem; }
+
+    /* ===== 页脚 ===== */
+    .footer {
+      margin-top: 2.5rem;
+      padding-top: 1.5rem;
+      border-top: 1px solid var(--color-border);
+      font-size: 0.78rem;
+      color: #a0aec0;
+      text-align: center;
+      line-height: 1.7;
+    }
+
+    .footer a {
+      color: var(--color-primary);
+      text-decoration: none;
+      font-weight: 500;
+    }
+
+    .footer a:hover { text-decoration: underline; }
+
+    /* ============================================================
+       移动端适配：max-width 640px
+       ============================================================ */
+    @media (max-width: 640px) {
+      body { padding: 0.75rem 0.5rem; }
+
+      .container {
+        padding: 1.5rem 1rem;
+        border-radius: var(--radius-md);
+      }
+
+      .header h1 { font-size: 1.4rem; }
+      .header .subhead { font-size: 0.88rem; }
+      .header .meta { font-size: 0.75rem; gap: 0.5rem 1rem; }
+
+      .compare-demo { grid-template-columns: 1fr; }
+      .concept-grid { grid-template-columns: 1fr; }
+
+      .arch-flow { flex-direction: column; gap: 0.4rem; }
+      .arch-arrow { transform: rotate(90deg); }
+
+      .module-body { grid-template-columns: 1fr; gap: 1rem; }
+      .module-header { flex-wrap: wrap; }
+      .module-tag {
+        order: 3;
+        flex-basis: 100%;
+        text-align: center;
+        margin-top: 0.15rem;
+      }
+
+      .benchmark-grid { grid-template-columns: 1fr 1fr; }
+
+      .compare-row {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 0.25rem;
+      }
+
+      .compare-label {
+        flex: none;
+        text-align: left;
+        font-size: 0.78rem;
+        padding-left: 0.15rem;
+      }
+
+      .compare-track { height: 24px; }
+
+      .compare-fill {
+        font-size: 0.68rem;
+        padding-left: 0.5rem;
+        min-width: 55px;
+      }
+
+      .fork-branches {
+        grid-template-columns: 1fr;
+        gap: 0.6rem;
+      }
+
+      .branch-path::before {
+        display: none;
+      }
+
+      .pipe-stage {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.3rem;
+        padding: 0.75rem 0.95rem;
+      }
+
+      .stage-label { min-width: 0; }
+
+      .section-title { font-size: 1.15rem; }
+      .insight-card { padding: 1.1rem 1.2rem; }
+
+      .concept-box,
+      .arch-guide {
+        padding: 1.25rem 1.1rem 1.1rem;
+      }
+
+      .usecase-module { padding: 1.25rem 1.1rem 1.15rem; }
+      .module-title { font-size: 1rem; }
+
+      .bd-code {
+        font-size: 0.68rem;
+        padding: 0.6rem 0.7rem;
+      }
+    }
+
+    @media (max-width: 420px) {
+      .benchmark-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+
+  <!-- ===== HEADER ===== -->
+  <header class="header">
+    <div class="header-top">
+      <span class="badge">Jev · TypeSafe AI</span>
+      <span class="badge" style="background: #ecfdf5; color: #059669;">System One Model</span>
+    </div>
+    <h1>Jev：8 个真实用例<br>从输入到结构化决策的完整拆解</h1>
+    <p class="subhead">John Lindquist（egghead.io 创始人）在 Lenny's Newsletter 的分享。他演示的是一种根本不同的模型使用范式：把 AI 嵌入软件的方式，从“生成文本后解析”变为“直接返回结构化决策”。</p>
+    <div class="meta">
+      <span>📅 2026-09-30</span>
+      <span>🎙️ How I AI 播客 · Claire Vo 主持</span>
+      <span>⏱️ 约 40 分钟</span>
+    </div>
+  </header>
+
+  <!-- ===== 核心洞察 ===== -->
+  <div class="insight-card">
+    <h2>💡 一句话抓住本质</h2>
+    <p>Jev 不是一个更小的 ChatGPT。它是<strong>决策引擎</strong>：你给它一个输入，再加上一个事先定义好的选项集合，它直接返回“选哪一个 + 置信度多少”。没有生成文本，没有解析，没有猜测——代码拿到结果就能直接执行。<strong>模型负责判断，你的代码负责执行。</strong></p>
+    <p>名字来自 19 世纪经济学家威廉·斯坦利·杰文斯（Jevons Paradox）：<strong>当决策成本趋近于零，对决策的需求反而会激增</strong>。TypeSafe AI 把这一直觉做成了产品。</p>
+  </div>
+
+  <!-- ===== 概念解释 ===== -->
+  <div class="concept-box">
+    <h2>📖 先理解四个关键词</h2>
+    <p class="lead">“带校准概率的结构化决策”——我们把它拆成四块，逐一看清。</p>
+
+    <div class="compare-demo">
+      <div class="demo-side bad">
+        <h4>❌ 普通 LLM 的做法</h4>
+        <div class="demo-line label">输入</div>
+        <div class="demo-line">“这是拿铁还是卡布奇诺？”</div>
+        <div class="demo-arrow">↓</div>
+        <div class="demo-line label">输出（一段文本）</div>
+        <div class="demo-line output-bad">“嗯，根据我的观察，这杯咖啡表面有丰富的奶泡，奶泡比较厚，可能是卡布奇诺，但也可能是拿铁……”</div>
+        <div class="demo-arrow">↓</div>
+        <div class="demo-line label">你的代码要做的</div>
+        <div class="demo-line">解析文本 → 猜意图 → 处理模糊性 → 可能出错</div>
+      </div>
+
+      <div class="demo-side good">
+        <h4>✅ Jev 的做法</h4>
+        <div class="demo-line label">输入 + 固定选项</div>
+        <div class="demo-line">“这是拿铁还是卡布奇诺？”<br>[拿铁, 卡布奇诺]</div>
+        <div class="demo-arrow">↓</div>
+        <div class="demo-line label">输出（一个对象）</div>
+        <div class="demo-line output-good">{ choice: "卡布奇诺",<br>  confidence: 0.87,<br>  scores: { 拿铁: 0.13,<br>            卡布奇诺: 0.87 } }</div>
+        <div class="demo-arrow">↓</div>
+        <div class="demo-line label">你的代码要做的</div>
+        <div class="demo-line">判断 <code>confidence &gt; 0.8</code> → 直接下单</div>
+      </div>
+    </div>
+
+    <div class="concept-grid">
+      <div class="concept-mini">
+        <h5>🎯 结构化</h5>
+        <p>输出不是自由文本，而是类型化的对象。Jev 有三种提问原语：<strong>Choice</strong>（从最多 255 个选项里挑一个）、<strong>Score</strong>（在 2–10 档量表上给分）、<strong>Noul</strong>（是/否判断，返回 0–1 概率）。输出空间在调用前就已固定。</p>
+      </div>
+      <div class="concept-mini">
+        <h5>📊 概率</h5>
+        <p>Choice 返回每个选项的概率分布（总和为 1），Score 返回概率加权的档位位置，Noul 返回“是”的概率。像天气预报说“降水概率 80%”一样，你知道这个决策有多确定。</p>
+      </div>
+      <div class="concept-mini">
+        <h5>⚖️ 校准</h5>
+        <p>当 Jev 说 confidence = 0.8，那它在 80% 的情况下确实是对的——这是经过 RLCD 训练验证的统计特性，而非模型的主观自信。</p>
+      </div>
+    </div>
+
+    <div class="calibration-note">
+      <strong>“校准”为什么重要？</strong>普通 LLM 的 token 概率常常过度自信——它说“99%”的时候，实际可能只有 60% 是对的。Jev 的概率经过校准，所以你可以直接用阈值做自动化决策。<strong>关键原则：阈值不是一个数，它随风险分层。</strong>
+      <div class="threshold-table">
+        <span class="range">&gt; 0.90</span><span class="action">自动执行，无需人工介入</span>
+        <span class="range">0.75 – 0.90</span><span class="action">执行 + 写入日志，便于事后抽查</span>
+        <span class="range">0.55 – 0.75</span><span class="action">标记为“待人工复核”，附带模型建议答案</span>
+        <span class="range">&lt; 0.55</span><span class="action">拒绝执行，升级到更大的模型或人工处理</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== 架构决策指引（含决策流） ===== -->
+  <div class="arch-guide">
+    <h2>🏗️ 架构决策指引：Jev 和 LLM 如何协作</h2>
+    <p class="lead">Jev 不是 LLM 的替代品，而是 LLM 的决策前置层。下面是完整的决策流，以及它与 LLM 的协作方式。</p>
+
+    <!-- 决策流 pipeline -->
+    <div class="pipeline">
+      <div class="pipe-stage">
+        <span class="stage-label">输入</span>
+        <div class="stage-content">
+          自然语言 · 语音转写 · 页面事件 · JSON 状态
+        </div>
+      </div>
+      <div class="pipe-arrow">↓</div>
+      <div class="pipe-stage">
+        <span class="stage-label">决策</span>
+        <div class="stage-content">
+          <span class="chip choice">Choice</span>
+          <span class="chip score">Score</span>
+          <span class="chip noul">Noul</span>
+          <span style="color: var(--color-text-tertiary); margin-left: 0.3rem;">输出空间在调用前固定，无幻觉</span>
+        </div>
+      </div>
+      <div class="pipe-arrow">↓</div>
+      <div class="pipe-stage">
+        <span class="stage-label">校准</span>
+        <div class="stage-content">
+          每个选项的校准概率 + 总体置信度评分
+        </div>
+      </div>
+      <div class="pipe-fork">
+        <div class="fork-headline">
+          置信度分派
+          <span class="fork-sub">Confidence Dispatch</span>
+        </div>
+        <div class="fork-branches">
+          <div class="branch-path high">
+            <div class="branch-threshold">≥ 0.90</div>
+            <div class="branch-action">
+              自动执行
+              <small>函数调用 · 路由跳转 · 自动合并 · 创建待办</small>
+            </div>
+          </div>
+          <div class="branch-path mid">
+            <div class="branch-threshold">0.60 – 0.90</div>
+            <div class="branch-action">
+              二次判断
+              <small>LLM 生成 / 复核 · 回显确认 · 写入日志 · 人工队列</small>
+            </div>
+          </div>
+          <div class="branch-path low">
+            <div class="branch-threshold">&lt; 0.60</div>
+            <div class="branch-action">
+              升级处理
+              <small>拒绝执行 · 回退 LLM · 追问澄清 · 人工介入</small>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="cross-cutting">
+        <span class="cc-label">实时场景</span>
+        <strong>实时语音、演示教练、多智能体协调</strong>对延迟极度敏感（&lt; 200ms），因此选择 Jev 而非传统 LLM。
+      </div>
+    </div>
+
+    <!-- LLM 协作回路 -->
+    <h3 style="margin-top: 1.75rem;">LLM 生成后经 Jev 验证</h3>
+    <div class="arch-flow">
+      <div class="arch-node llm-node">LLM 生成层<br><small style="font-weight:400;font-size:0.68rem;">回复 / 摘要 / 代码 / 推理</small></div>
+      <span class="arch-arrow">→</span>
+      <div class="arch-node jev-node">Jev 验证层<br><small style="font-weight:400;font-size:0.68rem;">输出质量 / 合规 / 安全性</small></div>
+      <span class="arch-arrow">→</span>
+      <div class="arch-node out-node">最终输出</div>
+    </div>
+  </div>
+
+  <!-- ===== 8 个用例 ===== -->
+  <h2 class="section-title"><span class="icon">🧩</span> 8 个真实用例 · 逐个拆解</h2>
+
+  <!-- 用例 1 -->
+  <div class="usecase-module">
+    <div class="module-header">
+      <span class="module-num">1</span>
+      <h3 class="module-title">实时语音待办应用</h3>
+      <span class="module-tag">⚡ 零延迟</span>
+    </div>
+    <div class="module-body">
+      <div class="module-story">
+        <h4>场景与挑战</h4>
+        <p>用户在做别的事时随口说一句“提醒我明天下午三点跟 Sarah 开会”，希望在句子还没说完的时候，应用就已经把待办创建好了。</p>
+        <p>传统 LLM 每次调用需要 <strong>1.5–3 秒</strong>：用户说完 → 上传 → 等待 → 收到文本回复 → 解析出意图。体验上出现明显断裂。</p>
+        <p>Jev 把整个链路压缩到 <strong>约 200 毫秒</strong>：语音流式转写完成后，Jev 立刻返回结构化的 action 和槽位，应用直接创建待办，用户感知不到任何停顿。</p>
+      </div>
+      <div class="module-breakdown">
+        <h4>拆解：输入 → 选项 → 返回</h4>
+        <div class="bd-block">
+          <div class="bd-row">
+            <span class="bd-key in">输入</span>
+            <span class="bd-val">"嗯，提醒我明天下午三点跟 Sarah 开会"</span>
+          </div>
+          <div class="bd-row">
+            <span class="bd-key space">选项</span>
+            <span class="bd-val"><code>添加待办</code> <code>完成待办</code> <code>删除待办</code> <code>查询待办</code> <code>修改待办</code></span>
+          </div>
+          <div class="bd-row">
+            <span class="bd-key out">返回</span>
+            <div class="bd-val">
+              <div class="bd-code"><span class="k">intent</span>: <span class="s">"添加待办"</span>
+<span class="k">conf</span>: <span class="n">0.96</span>
+<span class="k">slots</span>: {
+  <span class="k">title</span>: <span class="s">"跟 Sarah 开会"</span>
+  <span class="k">due</span>: <span class="s">"2026-10-02T15:00"</span>
+}</div>
+            </div>
+          </div>
+        </div>
+        <div class="confidence-strategy">
+          <span class="strategy-label">置信度策略</span>
+          <code>conf &gt; 0.9</code> 直接创建；<code>0.7–0.9</code> 回显“我理解为你要添加…”让用户确认；<code>&lt; 0.7</code> 追问“你是想添加还是查询？”
+        </div>
+        <div class="app-notes">
+          <span class="app-label">应用层要点</span>
+          <ul>
+            <li><strong>流式转写 + 同步调用：</strong>Jev 的 200ms 延迟允许在语音转写完成前就提交部分文本，进一步压缩端到端延迟。</li>
+            <li><strong>日期/时间不要交给 Jev：</strong>TypeSafe 文档明确说明 Jev 当前版本按字面读取指令，不擅长计数，日期视为文本——确定性逻辑保留在代码中，用 <code>chrono</code> 或 <code>date-fns</code> 解析日期。</li>
+            <li><strong>幂等保护：</strong>语音识别可能重复触发，在代码层用 <code>request_id</code> 做幂等去重，避免创建重复待办。</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 用例 2 -->
+  <div class="usecase-module">
+    <div class="module-header">
+      <span class="module-num">2</span>
+      <h3 class="module-title">自然语言 → 函数名</h3>
+      <span class="module-tag">🔀 语义路由</span>
+    </div>
+    <div class="module-body">
+      <div class="module-story">
+        <h4>场景与挑战</h4>
+        <p>语音助手或客服 chatbot 最常见的需求：把用户说的话直接转成可执行的函数调用。</p>
+        <p>传统 LLM 走的是“function calling”路线——模型先输出一段 JSON 描述，再由调用方解析。每多一层解析就多一次出错机会，而且模型可能生成多余解释、参数名写错、或用不在列表里的函数。</p>
+        <p>Jev 把可用函数列表直接作为选项空间：<strong>输出只能是预定义函数名之一</strong>，参数也从固定的槽位提取。<strong>“无幻觉”的真正含义不是“从不犯错”，而是“结构上不可能返回你选项之外的值”。</strong></p>
+      </div>
+      <div class="module-breakdown">
+        <h4>拆解：输入 → 选项 → 返回</h4>
+        <div class="bd-block">
+          <div class="bd-row">
+            <span class="bd-key in">输入</span>
+            <span class="bd-val">"把牛奶加入购物车"</span>
+          </div>
+          <div class="bd-row">
+            <span class="bd-key space">选项</span>
+            <span class="bd-val"><code>addToCart</code> <code>removeFromCart</code> <code>viewCart</code> <code>searchProducts</code> <code>checkout</code></span>
+          </div>
+          <div class="bd-row">
+            <span class="bd-key out">返回</span>
+            <div class="bd-val">
+              <div class="bd-code"><span class="k">fn</span>: <span class="s">"addToCart"</span>
+<span class="k">conf</span>: <span class="n">0.98</span>
+<span class="k">args</span>: { <span class="k">item</span>: <span class="s">"牛奶"</span> }</div>
+            </div>
+          </div>
+        </div>
+        <div class="confidence-strategy">
+          <span class="strategy-label">置信度策略</span>
+          <code>conf &gt; 0.9</code> 直接执行；<code>0.6–0.9</code> 询问“你是想加入购物车吗？”；<code>&lt; 0.6</code> 回退到通用对话模型。
+        </div>
+        <div class="app-notes">
+          <span class="app-label">应用层要点</span>
+          <ul>
+            <li><strong>函数签名 = 选项列表：</strong>把每个可用函数作为一个 Choice 选项，函数参数的 schema 写在 <code>instructions</code> 里，用点号路径引用 state 字段。</li>
+            <li><strong>善用并行问题：</strong>一次调用可以同时判断“意图函数”和“参数提取”两个独立问题，13 个问题合成一次调用比拆成 13 次单独调用便宜 11.5 倍、快 9.6 倍。</li>
+            <li><strong>参数校验留在代码里：</strong>Jev 提取的槽位值需要经过你的代码校验（类型、范围、枚举合法性），不要让模型直接触发副作用操作。</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 用例 3 -->
+  <div class="usecase-module">
+    <div class="module-header">
+      <span class="module-num">3</span>
+      <h3 class="module-title">数据去重与记录合并</h3>
+      <span class="module-tag">📊 置信度驱动</span>
+    </div>
+    <div class="module-body">
+      <div class="module-story">
+        <h4>场景与挑战</h4>
+        <p>CRM 导入、用户清洗、订单合并——脏数据里的重复记录永远是最费人力的部分。</p>
+        <p>字符串相似度算法（如 Levenshtein）在这里几乎没用：“John Smith”和“J. Smith”只差几个字符，“张三”和“张 三”看着一样却不同人。真正的判断需要<strong>语义理解</strong>——“这两条记录是否指向现实中的同一个实体”。</p>
+        <p>Jev 用成对比较 + 校准置信度完成这件事。10 万对记录的成本约 <strong>$0.02</strong>，传统 LLM 处理同样规模需要 <strong>$50+</strong>。</p>
+      </div>
+      <div class="module-breakdown">
+        <h4>拆解：输入 → 选项 → 返回</h4>
+        <div class="bd-block">
+          <div class="bd-row">
+            <span class="bd-key in">输入</span>
+            <span class="bd-val">A: <code>{name:"John Smith", email:"js@a.com"}</code><br>B: <code>{name:"J. Smith", email:"js@a.com"}</code></span>
+          </div>
+          <div class="bd-row">
+            <span class="bd-key space">选项</span>
+            <span class="bd-val"><code>同一实体</code> <code>不同实体</code></span>
+          </div>
+          <div class="bd-row">
+            <span class="bd-key out">返回</span>
+            <div class="bd-val">
+              <div class="bd-code"><span class="k">decision</span>: <span class="s">"同一实体"</span>
+<span class="k">conf</span>: <span class="n">0.94</span></div>
+            </div>
+          </div>
+        </div>
+        <div class="confidence-strategy">
+          <span class="strategy-label">置信度策略</span>
+          <code>&gt; 0.9</code> 自动合并；<code>0.6–0.9</code> 进入人工复核队列；<code>&lt; 0.6</code> 视为不同实体。
+        </div>
+        <div class="app-notes">
+          <span class="app-label">应用层要点</span>
+          <ul>
+            <li><strong>先用廉价规则做候选筛选：</strong>不要对 N 条记录做 N² 次 Jev 调用。先用 email 精确匹配、电话后四位等做粗筛，只对候选对调用 Jev。</li>
+            <li><strong>问题措辞要正向：</strong>问“这两条记录是否指向同一实体”比“这两条记录是否不同”准确率更高。</li>
+            <li><strong>把置信度当“风险预算”用：</strong>高置信度自动合并，中置信度标记“可能重复”给人工一键确认，低置信度直接跳过。</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 用例 4 -->
+  <div class="usecase-module">
+    <div class="module-header">
+      <span class="module-num">4</span>
+      <h3 class="module-title">多级应用路由</h3>
+      <span class="module-tag">🧭 路由器架构</span>
+    </div>
+    <div class="module-body">
+      <div class="module-story">
+        <h4>场景与挑战</h4>
+        <p>一个复杂的 SaaS 应用有几十个页面。用户说“我想退掉上个月买的鞋子”，系统需要把他导航到退货流程的正确入口。</p>
+        <p>传统做法是 intent classification：需要大量标注数据训练分类器，规则一旦过期就失效，而且很难处理组合意图。</p>
+        <p>Jev 作为<strong>逐级路由器</strong>：每一级只面对当前页面的可选路径，输出下一步决策。<strong>它的最佳定位是嵌入 Agent 的“路由层”，而不是替代整个应用逻辑。</strong></p>
+      </div>
+      <div class="module-breakdown">
+        <h4>拆解：输入 → 选项 → 返回</h4>
+        <div class="bd-block">
+          <div class="bd-row">
+            <span class="bd-key in">输入</span>
+            <span class="bd-val">"我想退掉上个月买的鞋子"</span>
+          </div>
+          <div class="bd-row">
+            <span class="bd-key space">选项</span>
+            <span class="bd-val"><code>订单相关</code> <code>退货退款</code> <code>账户设置</code> <code>支付问题</code> <code>帮助中心</code></span>
+          </div>
+          <div class="bd-row">
+            <span class="bd-key out">返回</span>
+            <div class="bd-val">
+              <div class="bd-code"><span class="k">route</span>: <span class="s">"退货退款"</span>
+<span class="k">conf</span>: <span class="n">0.91</span>
+<span class="k">next</span>: <span class="s">"选择订单"</span></div>
+            </div>
+          </div>
+        </div>
+        <div class="confidence-strategy">
+          <span class="strategy-label">置信度策略</span>
+          <code>&gt; 0.85</code> 直接跳转；<code>0.6–0.85</code> 展示前两个候选让用户选；<code>&lt; 0.6</code> 回到主菜单。
+        </div>
+        <div class="app-notes">
+          <span class="app-label">应用层要点</span>
+          <ul>
+            <li><strong>路由问题是 Agent 架构的核心瓶颈：</strong>当文本模型回答“该调用哪个工具”时，它可能发明一个不存在的工具；Jev 只从你给的选项中返回，永远不会返回第四个。</li>
+            <li><strong>逐级路由 = 代码控制流：</strong>每一步 Jev 调用返回后，由代码决定是否进入下一级。不要在 Jev 内部做多步推理——它不是 System 2 模型。</li>
+            <li><strong>用 state 给 Jev 上下文：</strong>在 <code>instructions</code> 中引用用户的历史行为字段（如 <code>user.last_order_id</code>），让路由决策更有依据。</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 用例 5 -->
+  <div class="usecase-module">
+    <div class="module-header">
+      <span class="module-num">5</span>
+      <h3 class="module-title">棋类对弈 · 速度与成本基准</h3>
+      <span class="module-tag">♟️ 基准测试</span>
+    </div>
+    <div class="module-body">
+      <div class="module-story">
+        <h4>场景与挑战</h4>
+        <p>John 用一个极端场景来展示 Jev 的定位：让 Jev 和低推理 LLM 下一盘闪电棋，看谁在实际对弈中表现更好。</p>
+        <p>普通 LLM 每步需要 <strong>5–15 秒</strong>，成本约 $0.01/步，根本无法做实时对战。而且它的输出是自然语言，需要额外的解析层把“我建议走马到 f3”转成 <code>Nf3</code>。</p>
+        <p>Jev 以约 <strong>0.3 秒/步</strong>的速度“蜘蛛式”遍历约 30 个合法走法，返回 top-3 候选和分数。每步成本不到 <strong>$0.0001</strong>。</p>
+      </div>
+      <div class="module-breakdown">
+        <h4>拆解：输入 → 选项 → 返回</h4>
+        <div class="bd-block">
+          <div class="bd-row">
+            <span class="bd-key in">输入</span>
+            <span class="bd-val">当前棋盘状态（FEN 字符串）</span>
+          </div>
+          <div class="bd-row">
+            <span class="bd-key space">选项</span>
+            <span class="bd-val">约 30 个合法走法（由棋盘状态生成）</span>
+          </div>
+          <div class="bd-row">
+            <span class="bd-key out">返回</span>
+            <div class="bd-val">
+              <div class="bd-code"><span class="k">top3</span>: [
+  { <span class="k">move</span>: <span class="s">"Nf3"</span>, <span class="k">score</span>: <span class="n">0.82</span> },
+  { <span class="k">move</span>: <span class="s">"e4"</span>,  <span class="k">score</span>: <span class="n">0.76</span> },
+  { <span class="k">move</span>: <span class="s">"d4"</span>,  <span class="k">score</span>: <span class="n">0.71</span> }
+]
+<span class="k">conf</span>: <span class="n">0.82</span></div>
+            </div>
+          </div>
+        </div>
+        <div class="confidence-strategy">
+          <span class="strategy-label">置信度策略</span>
+          这里比的不是“谁更聪明”，而是“单位决策成本谁更低”。Jev 不是国际象棋引擎，它证明的是：<strong>需要快速遍历决策空间的场景，Jev 的成本结构完全不同</strong>。
+        </div>
+        <div class="app-notes">
+          <span class="app-label">应用层要点</span>
+          <ul>
+            <li><strong>用 Score 原语做排序：</strong>当选项之间有递进关系（如“好/较好/一般/差”），用 Score 而不是 Choice，因为 Score 能表达“主要落在第 1 档、有一点落在第 2 档”的微妙差异。</li>
+            <li><strong>Top-K 而非 Top-1：</strong>让 Jev 返回概率最高的前 3 个候选，你的代码可以在候选间做二次筛选（比如排除不合法的走法），提高整体准确率。</li>
+            <li><strong>成本结构决定架构：</strong>当单次决策成本低于 $0.0001，你可以设计“每个事件都调用 Jev”的架构，而不是传统 LLM 时代的“批量处理 + 缓存”模式。</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 用例 6 -->
+  <div class="usecase-module">
+    <div class="module-header">
+      <span class="module-num">6</span>
+      <h3 class="module-title">多步分类流水线</h3>
+      <span class="module-tag">🔗 链式调用</span>
+    </div>
+    <div class="module-body">
+      <div class="module-story">
+        <h4>场景与挑战</h4>
+        <p>当分类空间很大（比如客服工单有 20+ 类别），一次性把所有选项丢给模型，准确率会显著下降。模型容易在大列表里“看花眼”。</p>
+        <p>John 的做法是<strong>把一次分类拆成多步树形分类</strong>：每步只面对 3–5 个选项，逐步缩小范围。虽然总调用次数增加，但每次 Jev 调用的成本低到可以忽略不计。</p>
+        <p>更关键的是：<strong>多因素判断要拆开，在代码里加权合成。</strong>不要问“给这个创业 pitch 打分”，而是分别问市场规模、技术可行性、差异化，再用你自己的公式合成。好处是优先级变化时你改的是代码里的系数，不用重写提示词。</p>
+      </div>
+      <div class="module-breakdown">
+        <h4>拆解：输入 → 多级选项 → 返回</h4>
+        <div class="bd-block">
+          <div class="bd-row">
+            <span class="bd-key in">输入</span>
+            <span class="bd-val">客服工单文本（一段自然语言）</span>
+          </div>
+          <div class="bd-row">
+            <span class="bd-key space">第 1 步</span>
+            <span class="bd-val"><code>账单</code> <code>技术</code> <code>退款</code> <code>账户</code> <code>其他</code></span>
+          </div>
+          <div class="bd-row">
+            <span class="bd-key space">第 2 步</span>
+            <span class="bd-val"><code>紧急</code> <code>一般</code> <code>低</code></span>
+          </div>
+          <div class="bd-row">
+            <span class="bd-key out">返回</span>
+            <div class="bd-val">
+              <div class="bd-code">Step 1 → { <span class="k">category</span>: <span class="s">"账单"</span>, <span class="k">conf</span>: <span class="n">0.88</span> }
+Step 2 → { <span class="k">priority</span>: <span class="s">"紧急"</span>, <span class="k">conf</span>: <span class="n">0.93</span> }</div>
+            </div>
+          </div>
+        </div>
+        <div class="confidence-strategy">
+          <span class="strategy-label">置信度策略</span>
+          每步独立判断置信度：<code>&gt; 0.85</code> 进入下一层；<code>&lt; 0.85</code> 在该层扩展更细的选项子集，或直接路由到人工。
+        </div>
+        <div class="app-notes">
+          <span class="app-label">应用层要点</span>
+          <ul>
+            <li><strong>一次问满比拆多次更高效：</strong>Jev 的并行 sampler 允许一次请求同时回答多个独立问题。处理一张发票时，可以同时判断发票类型、异常风险、审批级别和是否需要人工复核。</li>
+            <li><strong>问题命名按测量对象，而非操作意图：</strong>用 <code>is_time_sensitive</code> 而不是 <code>route_to_incident</code>，前者能跨策略变更复用，后者一旦路由规则变了就得改提示词。</li>
+            <li><strong>阈值收敛到一个配置对象：</strong>不要让你的阈值散落在十几个 <code>if-else</code> 里。把所有置信度阈值集中管理，改一行全生效。</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 用例 7 -->
+  <div class="usecase-module">
+    <div class="module-header">
+      <span class="module-num">7</span>
+      <h3 class="module-title">维基百科“通往哲学”路径映射</h3>
+      <span class="module-tag">🧭 浏览器导航</span>
+    </div>
+    <div class="module-body">
+      <div class="module-story">
+        <h4>场景与挑战</h4>
+        <p>“通往哲学”是维基百科的一个经典挑战：从任意词条出发，只点第一个链接，最终几乎总能到达“Philosophy”条目。它本质上是一个<strong>路径搜索问题</strong>。</p>
+        <p>John 用这个场景来对比两种思路：LLM 试图把整个页面当作“无限画布”来处理，容易迷路；Jev 则把页面上的所有可点击链接当作<strong>有限的决策集</strong>，每一步只回答“下一个链接点哪个”。</p>
+        <p>这是一个把 DOM 交互视为决策问题的样板——它不是“让 AI 浏览网页”，而是“让 AI 在候选链接中做选择”。</p>
+      </div>
+      <div class="module-breakdown">
+        <h4>拆解：输入 → 选项 → 返回</h4>
+        <div class="bd-block">
+          <div class="bd-row">
+            <span class="bd-key in">输入</span>
+            <span class="bd-val">当前页面 URL + 目标页面（Philosophy）</span>
+          </div>
+          <div class="bd-row">
+            <span class="bd-key space">选项</span>
+            <span class="bd-val">页面上所有可点击链接（动态生成）</span>
+          </div>
+          <div class="bd-row">
+            <span class="bd-key out">返回</span>
+            <div class="bd-val">
+              <div class="bd-code"><span class="k">nextLink</span>: <span class="s">"Philosophy"</span>
+<span class="k">conf</span>: <span class="n">0.79</span></div>
+            </div>
+          </div>
+        </div>
+        <div class="confidence-strategy">
+          <span class="strategy-label">置信度策略</span>
+          <code>conf &gt; 0.8</code> 直接点击；<code>0.5–0.8</code> 回退到备用链接（排序第二）；<code>&lt; 0.5</code> 记录路径失败并重启。每一步都可以<strong>单独验证</strong>。
+        </div>
+        <div class="app-notes">
+          <span class="app-label">应用层要点</span>
+          <ul>
+            <li><strong>DOM 交互 = 决策集，不是自由画布：</strong>把页面上所有可操作元素（按钮、链接、表单）作为一个 Choice 的选项集，Jev 只回答“下一步操作哪个”。</li>
+            <li><strong>每一步独立可验证：</strong>路径导航的最大优势是——出问题只影响一步，不影响整条链。每步的 conf 低于阈值时可以回退或重新选择。</li>
+            <li><strong>状态管理在代码层：</strong>Jev 不维护上下文，每次调用都需要你把当前页面状态（URL、可见元素列表）作为 <code>state</code> 传入。</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 用例 8 -->
+  <div class="usecase-module">
+    <div class="module-header">
+      <span class="module-num">8</span>
+      <h3 class="module-title">实时演示教练</h3>
+      <span class="module-tag">🎤 实时反馈</span>
+    </div>
+    <div class="module-body">
+      <div class="module-story">
+        <h4>场景与挑战</h4>
+        <p>演讲者在台上讲，希望有人实时提醒：“市场分析这点还没讲到”“你现在跑题了”“商业模式已经覆盖”。传统做法是真人教练，成本高且难以规模化。</p>
+        <p>传统 LLM 的秒级延迟无法支撑这个场景——演讲者不可能等 AI 两三秒后再给反馈，讲座节奏早就走完了。</p>
+        <p>Jev 实时监听语音转写，与预先设定的要点清单交叉比对，<strong>毫秒级</strong>返回每个要点的覆盖状态，还可以追踪主题漂移。</p>
+      </div>
+      <div class="module-breakdown">
+        <h4>拆解：输入 → 选项 → 返回</h4>
+        <div class="bd-block">
+          <div class="bd-row">
+            <span class="bd-key in">输入</span>
+            <span class="bd-val">实时语音转写 + 要点清单<br><code>[问题陈述, 市场分析, 解决方案, 商业模式]</code></span>
+          </div>
+          <div class="bd-row">
+            <span class="bd-key space">选项</span>
+            <span class="bd-val">每个要点的状态：<code>未覆盖</code> <code>部分覆盖</code> <code>已覆盖</code></span>
+          </div>
+          <div class="bd-row">
+            <span class="bd-key out">返回</span>
+            <div class="bd-val">
+              <div class="bd-code"><span class="k">checkpoint</span>: <span class="s">"市场分析"</span>
+<span class="k">status</span>: <span class="s">"已覆盖"</span>
+<span class="k">conf</span>: <span class="n">0.91</span></div>
+            </div>
+          </div>
+        </div>
+        <div class="confidence-strategy">
+          <span class="strategy-label">置信度策略</span>
+          <code>&gt; 0.85</code> 自动勾选；<code>0.6–0.85</code> 标记为“可能已覆盖”但仍高亮提醒；<code>&lt; 0.6</code> 不做判断，避免误报打断演讲者。
+        </div>
+        <div class="app-notes">
+          <span class="app-label">应用层要点</span>
+          <ul>
+            <li><strong>滑动窗口而非全量上下文：</strong>实时场景下不要传整场演讲的转写，而是传最近 30–60 秒的滑动窗口 + 已覆盖状态摘要，控制输入 token 量。</li>
+            <li><strong>用 Noul 做二值判断：</strong>“当前窗口是否覆盖了‘市场分析’要点？”这是一个典型的 Noul 问题——返回 0–1 概率，代码用阈值判断是否勾选。</li>
+            <li><strong>在 shadow mode 验证阈值：</strong>TypeSafe 建议先用影子模式记录 Jev 的判断和实际结果，用自己的标注数据校准阈值后再开启自动化。</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== 额外补充 ===== -->
+  <div class="extra-note">
+    <strong>🧠 额外演示：多智能体协调与避碰。</strong>多个智能体同时运行时，Jev 实时分析各智能体状态，通过“即时规划”把它们引导到不同路径，避免碰撞与资源冲突。Jev 负责快速局部决策（<strong>“下一步往哪走”</strong>），更慢的推理模型（System 2）提供战略建议（<strong>“整体目标是什么”</strong>）而不中断 Jev 的实时控制。
+  </div>
+
+  <!-- ===== 生产部署检查清单 ===== -->
+  <h2 class="section-title"><span class="icon">✅</span> 生产部署检查清单</h2>
+
+  <div class="concept-box" style="margin-bottom: 2rem;">
+    <h2>上线前必须验证的 6 件事</h2>
+    <p class="lead">来自 TypeSafe 官方文档和早期采用者的实践总结。</p>
+
+    <div class="concept-grid" style="grid-template-columns: 1fr 1fr;">
+      <div class="concept-mini">
+        <h5>1. 影子模式验证阈值</h5>
+        <p>在生产流量上以 shadow mode 运行 Jev，记录每次判断的置信度和实际结果。用你自己的标注数据校准阈值，不要直接使用别人的默认值。</p>
+      </div>
+      <div class="concept-mini">
+        <h5>2. 锁定模型版本</h5>
+        <p>Jev 仍在快速迭代中。在生产环境锁定模型版本（如 <code>jev-1.13</code>），不要使用 <code>jev-latest</code>。版本升级前重新验证阈值。</p>
+      </div>
+      <div class="concept-mini">
+        <h5>3. 设计降级路径</h5>
+        <p>Jev 调用超时或返回低置信度时，代码必须有降级策略：升级到更大的 LLM、路由到人工队列、或返回安全的默认值。<strong>永远不要让 Jev 的失败阻塞主流程。</strong></p>
+      </div>
+      <div class="concept-mini">
+        <h5>4. 确定性逻辑保留在代码中</h5>
+        <p>Jev 当前版本按字面读取指令，不擅长计数，日期视为文本。数学运算、日期解析、安全规则——这些必须由你的代码处理，不要交给 Jev。</p>
+      </div>
+      <div class="concept-mini">
+        <h5>5. 置信度阈值按风险分层</h5>
+        <p>不要所有决策用同一个阈值。高风险操作（资金、删除、对外通信）用 <code>&gt; 0.95</code>，低风险操作（分类、标记、排序）用 <code>&gt; 0.75</code>。</p>
+      </div>
+      <div class="concept-mini">
+        <h5>6. 记录完整决策链</h5>
+        <p>每次 Jev 调用记录：输入 state 摘要、每个问题的答案和概率、最终决策、触发的阈值规则、延迟和 token 用量。没有这些日志，你无法调试也无法迭代阈值。</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== 性能对比 ===== -->
+  <h2 class="section-title"><span class="icon">📈</span> 速度与成本对比</h2>
+
+  <div class="benchmark-section">
+    <div class="benchmark-grid">
+      <div class="benchmark-stat">
+        <div class="value">70–500ms</div>
+        <div class="label">端到端响应</div>
+      </div>
+      <div class="benchmark-stat">
+        <div class="value">$0.042/M</div>
+        <div class="label">输入 token 价格</div>
+      </div>
+      <div class="benchmark-stat">
+        <div class="value">193×</div>
+        <div class="label">比前沿 LLM 更快</div>
+      </div>
+      <div class="benchmark-stat">
+        <div class="value">444×</div>
+        <div class="label">比前沿 LLM 更便宜</div>
+      </div>
+    </div>
+
+    <div class="compare-bars">
+      <div class="compare-row">
+        <span class="compare-label">Jev</span>
+        <div class="compare-track">
+          <div class="compare-fill jev" style="width: 12%;">
+            亚秒级 <small>~$0.00007/次</small>
+          </div>
+        </div>
+      </div>
+      <div class="compare-row">
+        <span class="compare-label">传统 LLM</span>
+        <div class="compare-track">
+          <div class="compare-fill llm" style="width: 88%;">
+            数秒级 <small>~$0.01+/次</small>
+          </div>
+        </div>
+      </div>
+      <div class="compare-row">
+        <span class="compare-label">Jev（路由）</span>
+        <div class="compare-track">
+          <div class="compare-fill jev" style="width: 6%;">
+            毫秒级 <small>结构化输出</small>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <p class="benchmark-footnote">
+      ⚠️ 数据来自 TypeSafe AI 自测及第三方早期测试（截至 2026 年 9 月），实际表现因任务与配置而异。独立基准测试显示 Jev 在 CLINC150 上达到 87% 零样本准确率（对比 GPT-5.4-nano 的 80%），在 Banking77 上达到 83%（对比监督编码器的 93%）。Jev 的“无幻觉”指结构合法性保证——输出一定符合预定义类型，不代表分类或评分的正确性。
+    </p>
+  </div>
+
+  <!-- ===== 局限 ===== -->
+  <div class="caveat-box">
+    <strong>⚠️ 何时仍需要完整生成模型：</strong>
+    <ul>
+      <li><strong>开放式推理与创意生成</strong>：Jev 只做“选择题”，不写文章、不生成代码、不做长链推理。</li>
+      <li><strong>图像与音频处理</strong>：Jev 只读文本，需先转换或配对其他模型。</li>
+      <li><strong>代码生成与复杂 Agent 上下文压缩</strong>：这些任务需要生成式模型的完整能力，Jev 在此场景可能削弱 prompt caching 带来的节省。</li>
+      <li><strong>低置信度决策</strong>：Jev 会返回错误分类，务必用置信度阈值决定何时信任、何时升级到人工或更大的模型。<strong>杰文斯悖论提醒我们：当决策变得足够便宜，你会自动化更多决策，任何高于基线的错误率都会累积成更多总错误。</strong></li>
+    </ul>
+  </div>
+
+  <!-- ===== FOOTER ===== -->
+  <footer class="footer">
+    <p>来源：<a href="https://www.lennysnewsletter.com/p/jev-8-real-use-cases-for-the-fastest" target="_blank" rel="noopener">Lenny's Newsletter — Jev: 8 real use cases for the fastest, cheapest model I've ever used</a> · 嘉宾 John Lindquist · 主持 Claire Vo</p>
+    <p style="margin-top: 0.4rem;">所有观点归原作者所有。Jev 由 TypeSafe AI 开发，创始人 Diogo Almeida（前 OpenAI 研究员，InstructGPT/RLHF 核心作者之一）。</p>
+  </footer>
+
+</div>
+<!-- /container -->
+
+</body>
+</html>

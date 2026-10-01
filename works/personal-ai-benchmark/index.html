@@ -1,0 +1,288 @@
+<!doctype html>
+<html lang="zh">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>如何建立你自己的个人 AI 评测基准 · AI 时代改写</title>
+<style>
+:root{
+  --bg:#F5F0EB; --card:#FFFDF9; --ink:#2B2723; --muted:#7A7068;
+  --line:#E7DED3; --accent:#2F6F8F; --accent-soft:#E6EFF3;
+  --warn:#C9762B; --warn-soft:#FBEEE1; --good:#2F8F6B; --good-soft:#E4F1EA;
+  --ai:#6B4FA0; --ai-soft:#EDE9F5; --danger:#B23B3B; --danger-soft:#F8E9E9;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);
+  font:15px/1.7 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif}
+.wrap{max-width:880px;margin:0 auto;padding:32px 22px 80px}
+header{border-bottom:1px solid var(--line);padding-bottom:20px;margin-bottom:24px}
+h1{font-size:27px;margin:0 0 6px;line-height:1.3}
+.sub{color:var(--muted);font-size:14px}
+.brief{background:var(--card);border:1px solid var(--line);border-left:4px solid var(--accent);
+  border-radius:14px;padding:16px 18px;font-size:14.5px;color:#4a443e;margin-bottom:26px}
+.brief b{color:var(--ink)}
+.arc{background:var(--card);border:1px solid var(--line);border-left:4px solid var(--ai);
+  border-radius:14px;padding:16px 18px;font-size:14.5px;color:#4a443e;margin-bottom:26px}
+.arc b{color:var(--ai)}
+.part{border-left:5px solid var(--muted);background:var(--card);border-radius:0 16px 16px 0;
+  padding:20px 22px;margin-bottom:18px}
+.part.l1{border-left-color:var(--accent)}
+.part.l2{border-left-color:var(--warn)}
+.part.l3{border-left-color:var(--good)}
+.part.l4{border-left-color:var(--ai)}
+.part h2{margin:0 0 4px;font-size:20px;display:flex;align-items:center;gap:10px}
+.part h2 .num{font-size:13px;font-weight:700;color:#fff;background:var(--muted);
+  border-radius:50%;width:24px;height:24px;display:inline-flex;align-items:center;justify-content:center}
+.part.l1 h2 .num{background:var(--accent)}
+.part.l2 h2 .num{background:var(--warn)}
+.part.l3 h2 .num{background:var(--good)}
+.part.l4 h2 .num{background:var(--ai)}
+.part .pitch{color:var(--muted);font-size:13.5px;margin:0 0 14px 34px}
+.tag{font-size:11px;letter-spacing:.8px;text-transform:uppercase;color:var(--muted);margin-bottom:4px}
+.model{border-top:1px dashed var(--line);padding:12px 0}
+.model:first-of-type{border-top:none}
+.model h4{margin:0 0 4px;font-size:15px}
+.model .en{color:var(--muted);font-size:12.5px;font-weight:400}
+.model p{margin:4px 0;font-size:14px;color:#4a443e}
+.use{background:var(--accent-soft);border-radius:8px;padding:8px 12px;font-size:13px;color:#23414f;margin-top:6px}
+.rewrite{background:var(--ai-soft);border-radius:10px;padding:12px 14px;margin-top:10px;border-left:3px solid var(--ai)}
+.rewrite .rh{font-size:12px;letter-spacing:.5px;text-transform:uppercase;color:var(--ai);margin-bottom:4px;font-weight:700}
+.rewrite p{margin:3px 0;font-size:13.5px;color:#3a2c52}
+.rewrite .bad{color:var(--danger);font-weight:600}
+.rewrite .ok{color:var(--good);font-weight:600}
+.timeline{list-style:none;margin:0 0 10px;padding:0;border-left:3px solid var(--line)}
+.timeline li{padding:6px 0 6px 18px;position:relative;font-size:14px}
+.timeline li::before{content:"";position:absolute;left:-7px;top:13px;width:11px;height:11px;border-radius:50%;background:var(--muted)}
+.timeline li:first-child::before{background:var(--warn)}
+.timeline li:nth-child(2)::before{background:var(--accent)}
+.timeline li:last-child::before{background:var(--ai)}
+.timeline b{color:var(--ink)}
+.timeline .now{color:var(--danger);font-size:12.5px}
+.folder{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:12px 14px;margin:10px 0;font-family:ui-monospace,Menlo,Consolas,monospace;font-size:13px;color:#4a443e;line-height:1.9}
+.folder .c{color:var(--accent)}
+.folder .g{color:var(--good)}
+.folder .a{color:var(--ai)}
+.lattice{background:var(--good-soft);border-left:4px solid var(--good);border-radius:10px;padding:12px 14px;font-size:14px;margin-top:8px}
+.warnbox{background:var(--warn-soft);border-left:4px solid var(--warn);border-radius:10px;padding:12px 14px;font-size:13.5px;margin-top:8px}
+ul{margin:8px 0 4px 20px;padding:0}
+li{margin:4px 0}
+ul.clean{list-style:none;margin-left:0}
+ul.clean li{padding-left:14px;position:relative}
+ul.clean li::before{content:"✓";position:absolute;left:0;color:var(--good);font-size:12px}
+.model .grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:8px}
+.model .grid2 .half{background:var(--card);border:1px solid var(--line);border-radius:8px;padding:8px 10px;font-size:12.5px}
+.model .grid2 .half b{display:block;font-size:12px;margin-bottom:3px}
+.h17{background:var(--ai-soft);border:1px solid #d8cbe8;border-radius:12px;padding:14px 16px;margin-top:10px}
+.h17 h4{margin:0 0 6px;color:var(--ai);font-size:16px}
+.h17 .en{color:#8a7ab0;font-size:12.5px;font-weight:400}
+.h17 p{margin:4px 0;font-size:13.5px;color:#3a2c52}
+footer{color:var(--muted);font-size:12.5px;border-top:1px solid var(--line);margin-top:30px;padding-top:16px}
+@media(max-width:600px){
+  body{font-size:14px}.part{padding:16px}.model .grid2{grid-template-columns:1fr}
+  h1{font-size:23px}.part .pitch{margin-left:0}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <h1>如何建立你自己的个人 AI 评测基准</h1>
+  <div class="sub">Mike Taylor · Every · 2026　→　AI 时代改写</div>
+</header>
+
+<div class="brief">
+  <b>这篇文章在讲什么？</b>
+  没人凭 SAT 成绩招副总裁，但每次出新模型，业界第一件事是查它在 Math Olympiad 和选择题百科上的分数，然后吵谁更聪明。
+  那类基准测的是"通用智力"——<b>方向有用，但回答不了真正的问题：这个模型能不能帮你干活。</b>
+  于是作者建立了一套<b>个人评测基准</b>：用 10 个你自己真实、且 AI 曾经搞砸的任务，快速判断"该不该换、能不能省钱"。
+</div>
+
+<div class="arc">
+  <b>贯穿全文的主轴 · 为什么"通用基准"解决不了个人选择？</b><br/>
+  作者挖出了一个反直觉的点：<b>大多数常用任务都落在"辨别地平线"（discernment horizon）以下</b>——即"好到够用"那条线，
+  绝大多数模型都能过，你根本分不出高下。<span class="bad">所以给爱因斯坦一个煮咖啡的活，你测不出他的物理水平。</span>
+  个人基准的真正价值，不是给模型排名，而是<b>找出那些"能让你感到差别"的任务</b>，以及把"你的品味"沉淀成可复用的评测标准。
+</div>
+
+<!-- ============ LEVEL 1 ============ -->
+<div class="part l1">
+  <h2><span class="num">1</span>Level 1 · 建立你的"口袋评测"</h2>
+  <p class="pitch">从 AI 上次的失败出发，而不是从"好任务"出发。3 个观点，全部围绕"怎么少花时间但选得对"。</p>
+
+  <div class="model">
+    <h4>从"失败"取样，不从重活取样 <span class="en">Back-Pocket Evals</span></h4>
+    <p>别再去重测 AI 已经干得很好的活（筛邮件、做仪表盘）。反过来：回想过去几周 AI 没做成的那几次，把它们收进一张"口袋清单"。Steve Yegge 的原话：每次交给模型的活没做成，就加进清单，"然后每次出新模型就像过圣诞"。</p>
+    <div class="use">用法：回看最近一个月的会话历史，筛出"没一次做对、来回很多、或半路放弃"的任务，凑够 10 个。</div>
+    <div class="rewrite">
+      <div class="rh">AI 时代改写 · 取样可以交给模型，但"难不难"要你自己定</div>
+      <p><span class="ok">省力正例：</span>让 Claude 或 Codex 桌面端直接扫本地会话记录、提取失败任务及完整上下文（参考文件、你会给实习生的叮嘱），它天然能读自己存的历史。</p>
+      <p><span class="bad">反例：</span>把"上次成功得很顺"的仪表盘当评测题——这类活最容易过线，测不出差别，只会让你觉得"反正都差不多"。</p>
+      <p>取样的关键不是"任务像不像真的"，而是<span class="ok">"它是否正好落在辨别地平线上方"</span>——稍难一点，差别才显形。</p>
+    </div>
+  </div>
+
+  <div class="model">
+    <h4>一次跑完，并排看 <span class="en">Run in Parallel, Side by Side</span></h4>
+    <p>把这 10 个任务并行丢给几个候选模型，让 Claude Code 一次跑完、并排输出，再让模型帮你搭一个"评测查看器"（一个能逐题对比各模型回答的 HTML 页面），直到你形成自己的判断。</p>
+    <div class="use">用法：别一题一题手动测。让 agent 批量跑，人只看"结果对照"这一层。</div>
+    <div class="rewrite">
+      <div class="rh">AI 时代改写 · "跑完"的成本归零，瓶颈变成"看不完"</div>
+      <p>批量并行执行现在几乎免费且瞬时，<span class="bad">真正的成本从"跑"转移到"逐份审阅"</span>——10 个任务 × 4 个模型就是 40 份输出。</p>
+      <p><span class="ok">所以查看器是核心，不是附属品：</span>它要把"原始输出 / 你的品味判断 / pass-fail 结果"三层叠在一起，并且能跨次对比（同题、不同模型、不同代际）。Anthropic 的 Claude Evals、OpenAI Evals、promptfoo、Hamming 这类工具，本质都在解决"怎么让 40 份输出变得可审阅"。</p>
+    </div>
+  </div>
+
+  <div class="model">
+    <h4>靠品味，不靠 100 分 <span class="en">Taste &gt; Score</span></h4>
+    <p>别让 AI 给模型输出打个"100 分制"的分。它其实先做了个粗略的定性（差/可接受/好），再给那个档编个看起来合理的数字——分数挤在 4/5 或 70/100 附近，精度是假的。换成<b>3 到 10 条的 pass/fail 检查项</b>：只要它通过了你在工作中会用到的全部检查，就用它。</p>
+    <div class="use">用法：与其问"这标题打几分"，不如问"这博客标题无聊吗？"——回答是/否比给数字有用。</div>
+    <div class="rewrite">
+      <div class="rh">AI 时代改写 · 评判也要用模型，但评判标准必须是你的</div>
+      <p><span class="ok">正例：</span>LLM-as-a-judge（用一个模型判另一个模型的活）。把你的品味先说清，让它按你的标准逐条 pass/fail——一个做、一个查。</p>
+      <p><span class="bad">反例：</span>让 AI 自己出 100 分制评分。它给的是"数字感"，不是"判断力"，5 分的差距不足以让你换掉整套工作流。</p>
+      <p>这条的 AI 时代结论：<b>分数可以交给模型，但"好"的定义只能来自你</b>——而这就是"品味"这件事无法被自动化的地方。</p>
+    </div>
+  </div>
+</div>
+
+<!-- ============ LEVEL 2 ============ -->
+<div class="part l2">
+  <h2><span class="num">2</span>Level 2 · 把品味沉淀成可复用的评测</h2>
+  <p class="pitch">Level 1 是"临时用一次"。Level 2 是把你每次的吐槽，变成模型下次会自动遵守的规则。</p>
+
+  <div class="model">
+    <h4>用语音把品味说出来 <span class="en">Voice Your Taste</span></h4>
+    <p>切到语音模式，对你常用的模型边想边说：这个标题炸、这段像 AI 写的、你没按我的品牌指南来。说得越多越好——这些就是你作为使用者的"品味"，它会把模型往你的标准上拉。</p>
+    <div class="use">用法：每个任务做完了，当场口述 1–3 条喜欢/不喜欢的地方，别攒。</div>
+    <div class="rewrite">
+      <div class="rh">AI 时代改写 · 品味要结构化，才能变成评测集</div>
+      <p>随口吐槽的最大问题是<span class="bad">不可复用</span>——下次它照样忘。正确做法：让模型把你的非结构化吐槽，转成一份<b>可重复的评测标准</b>（rubric）：哪些检查项、什么算 pass、什么算 fail。</p>
+      <p><span class="ok">这就是"品味即评测集"：</span>你对"好"的判断越具体，你给模型的判断空间越小，输出才越稳定。</p>
+    </div>
+  </div>
+
+  <div class="model">
+    <h4>转成可重复的评测 <span class="en">Rubric-as-Eval</span></h4>
+    <p>一旦模型懂了你喜欢什么，它就能在审阅输出时自动套用你会用的那套检查，并按你的偏好打分。每次评测新模型时跑一遍，就能看出它的回答符合不符合你的预期。</p>
+    <div class="use">用法：让模型把你的反馈整理成 rubric，再拿这份 rubric 去判新模型的输出。</div>
+    <div class="rewrite">
+      <div class="rh">AI 时代改写 · 评测集是长期被依赖的资产</div>
+      <p><span class="bad">常见误区：</span>rubric 写完就放着不动。它会"过期"——你的标准在变，模型能力也在变，过时的评测集只会给你过时的结论。</p>
+      <p><span class="ok">正确姿态：</span>把 rubric 当代码管——版本化、随每次模型代际重跑、失败的 case 回流进去。一份"能跑、能对比、能升级"的评测集，就是你在 AI 时代最难被复制的个人资产。</p>
+    </div>
+  </div>
+
+  <div class="model">
+    <h4>饱和了就升级难度 <span class="en">Escalate When Saturated</span></h4>
+    <p>你的基准会过期。Ethan Mollick 曾经用"让 AI 画一只在飞机上用 WiFi 的水獭"当难度锚，因为那时它普遍做不到；现在大多数模型都能做对了，这个基准就"饱和"了。他只好把题目升级成"画 1960 年代纪录片风格的、那支乐队在和水獭群出事前的最后一场演唱会"。基准要跟着模型能力一起升级。</p>
+    <div class="use">用法：定期重看基准题，发现"大家都能过"就换更难的、更贴近真实难题的题。</div>
+    <div class="rewrite">
+      <div class="rh">AI 时代改写 · 难度升级是持续活动，不是一次性</div>
+      <p>在指数期，<span class="bad">"饱和"来得比你想得快</span>。上季度够难的任务，下季度可能就成了所有模型的及格线——你的基准会静悄悄地失去分辨力。</p>
+      <p><span class="ok">所以 Dan Shipper 的"冲浪模型"（surf the models）才是正解：</span>模型每天都在变好，你要把"定期抬高基准难度"排进节奏，而不是等发现"怎么都差不多"才动手。</p>
+    </div>
+  </div>
+</div>
+
+<!-- ============ LEVEL 3 ============ -->
+<div class="part l3">
+  <h2><span class="num">3</span>Level 3 · 把基准变成工程系统</h2>
+  <p class="pitch">要给别人推荐模型，就得有更确定的分数。这时"口袋评测"就升级成团队/公司的工程问题。</p>
+
+  <div class="model">
+    <h4>从 10 个任务到"每题多 case" <span class="en">More Tasks, More Cases, Harder Tasks</span></h4>
+    <p>想让分数更可信，要加任务数、加每个任务的 case 数、并把题变难。一次做好一个 PPT 说服力有限，但一周稳定产出 20 个好 PPT，说明这是个在稳定工作的系统；一个成功可能是运气，很多成功才是系统。</p>
+    <div class="use">用法：把 10 个任务都扩成多 case，且难度明显上调。</div>
+    <div class="rewrite">
+      <div class="rh">AI 时代改写 · 规模一上来，"跑评测"本身就要自动化</div>
+      <p><span class="bad">瓶颈：</span>20 题 × 每题 20 case × 4 个模型 = 1600 次执行，手动等不起。</p>
+      <p><span class="ok">解法：</span>让 Claude 写一个脚本一次跑完全部 case，并把结果直接灌进你的查看器。评测系统的价值，一半在"标准"，一半在"能无人值守地跑"。</p>
+    </div>
+  </div>
+
+  <div class="model">
+    <h4>把每个任务变成 skill <span class="en">Turn Tasks into Skills</span></h4>
+    <p>把每个任务沉淀成一个 skill（技巧/技能包），就不必重复你的反馈。作者有 NPS 仪表盘 skill、PPT skill、AI 写作 skill——每个都装着他定下来的品味。每次跑任务，都把 brief、输出、反馈存进去归档，这样每题就有 20 个以上的样本，能回答"这个模型到底多会做 PPT"。</p>
+    <div class="use">用法：每做完一个任务，让 agent 自动归档"任务说明 + 输出 + 你的反馈"到一个 skill 里。</div>
+    <div class="rewrite">
+      <div class="rh">AI 时代改写 · skill 就是"会自我演进的评测集"</div>
+      <p>skill 的妙处在于它<b>双向</b>：<span class="ok">既规定了"这类活该怎么干"，也累积了"干得好坏的证据"</span>。新模型来了，先在这个 skill 的 case 上跑一遍，就知道它是不是够格接这个活。</p>
+      <p><span class="bad">反例：</span>只把 skill 当"自动生成说明文档"——那就只是省了写文档的时间，没沉淀判断力。</p>
+    </div>
+  </div>
+
+  <div class="model">
+    <h4>统一目录结构，降低对比成本 <span class="en">A Consistent Eval Folder</span></h4>
+    <p>用统一格式存放一切：</p>
+    <div class="folder">
+      evals/<br/>
+      ├─ <span class="a">index.html</span> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="muted">浏览器里并排查看评测结果</span><br/>
+      ├─ <span class="c">task-01/</span> … <span class="c">task-10/</span> &nbsp;<span class="muted">每题一个文件夹</span><br/>
+      │&nbsp;&nbsp; ├─ <span class="g">cases/</span> &nbsp;&nbsp;&nbsp;&nbsp;<span class="muted">要跑的各个 case</span><br/>
+      │&nbsp;&nbsp; ├─ <span class="c">context/</span> &nbsp;&nbsp;&nbsp;<span class="muted">完成该任务所需的全部文档</span><br/>
+      │&nbsp;&nbsp; ├─ <span class="c">gold/</span> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="muted">理想结果（如你实际交付的 PPT）</span><br/>
+      │&nbsp;&nbsp; └─ <span class="a">evals.py</span> &nbsp;&nbsp;&nbsp;<span class="muted">跑测试并给这个 case 打分的脚本</span><br/>
+      └─ <span class="a">run_all.sh</span> &nbsp;&nbsp;&nbsp;&nbsp;<span class="muted">一次跑完全部 case</span>
+    </div>
+    <p>点开 index.html 就能在浏览器里并排看结果；context 放完成该任务所需的全部文档；gold 是理想结果；evals.py 跑测试并打分。格式一致，才方便导航和对比。</p>
+    <div class="use">用法：照搬上面这个骨架，10 个任务先跑起来，再逐步把 case 加厚。</div>
+    <div class="rewrite">
+      <div class="rh">AI 时代改写 · 目录结构就是"评测即代码"的接口</div>
+      <p>这套结构之所以重要，是因为它让<b>评测可复现、可分享、可自动化</b>——同一个 case，任何人、任何模型、任何时间点跑，都能得到可比的结果。</p>
+      <p><span class="ok">它正是"个人品味"变成"团队共同语言"的载体：</span>你的 rubric 和 case 一旦结构化，别人就能看懂"你凭什么选了这个模型"，你的判断也就从直觉变成了可审计的证据。</p>
+    </div>
+  </div>
+</div>
+
+<!-- ============ PART 4 · AI 时代改写 ============ -->
+<div class="part l4">
+  <h2><span class="num">4</span>AI 时代 · 这篇文章在 2026 还成立吗</h2>
+  <p class="pitch">前三部分是"怎么建基准"。这部分的几条，是只有 AI 时代才被逼出来的、原文没有直接覆盖的问题。</p>
+
+  <ol class="timeline">
+    <li><b>选模型靠"万能基准"</b>（MMLU-Pro 之类）→ <b>选模型靠"我的活"</b><br/><span class="now">MMLU-Pro 会问模型"直立人的颅腔容量约多少"——方向有用，但测不出能不能帮你干活</span></li>
+    <li><b>评测是"人的主观打分"</b> → <b>评测是"机器跑 + 人定标准"</b>（LLM-as-a-judge）</li>
+    <li><b>基准是"一次性的清单"</b> → <b>基准是"会过期的活文档"</b>，要随能力代际升级</li>
+  </ol>
+
+  <div class="model">
+    <h4>转变一 · 从"排模型排行榜"到"排我的工作流"</h4>
+    <p>个人基准的最终目的不是给模型打分，而是回答两个问题：<b>什么时候该在 Astra / Fable 这类大模型和小而便宜的 Luna / Haiku 之间切换，以及哪些活真的省不下钱。</b> 作者自己的结论：例行活（做仪表盘）可以放心交给便宜几百倍的 Luna，真正开放的、要花心思的活才交给 Fable 和 Sol。</p>
+  </div>
+
+  <div class="model">
+    <h4>转变二 · 从"测输出"到"测判断"</h4>
+    <p>模型能帮你生成 40 份输出，<b>但哪一份符合你的品味、哪个方案值得采用，这个判断只能来自你</b>。所以评测的对象表面上是模型，实际上是你自己的判断力：你有多清楚"我要什么"，决定了评测有多准。</p>
+  </div>
+
+  <div class="model">
+    <h4>转变三 · 从"个人技巧"到"团队基础设施"</h4>
+    <p>当作者从"自己用"变成"帮全团队选模型"，口袋评测就升级成了工程问题：要自动化跑、要多人共用 rubric、要让结论可审计。<b>个人品味一旦结构化，就成了团队的共同语言。</b></p>
+  </div>
+
+  <div class="h17">
+    <h4>AI 时代第 17 个模型 · 你的品味即护城河 <span class="en">Taste as Moat</span></h4>
+    <p>原文最反直觉也最值钱的一句：<b>"够好"这条线之上是空的——多数模型对你常用的活都够好，所以你分不出好坏。</b> 但越过这条线之后，差别不是来自模型，而是来自<b>你有多会定义"好"</b>。</p>
+    <p><span class="bad">现实是：</span>给爱因斯坦一个煮咖啡的活，你测不出他的物理水平；给再强的模型一堆太容易的题，你也测不出它的上限。</p>
+    <p><span class="ok">落到执行：</span>把你的品味沉淀成 rubric 和 skill，让模型替你守住你的标准——<b>模型会被商品化，但"你有多会定义好"，是别人抢不走的。</b></p>
+  </div>
+
+  <div class="lattice">
+    <b>回到作者的收束：</b>AI 知道所有被写下来的东西，但"你在工作中怎么用它、它哪里还不够好"——这种判断是没人能在训练数据里替你生成的。
+    你的基准，就是把这种判断变成可复现评测的工具。定期测，才不会被行业的狂奔速度卷走，也才能把注意力留在"对你真正重要的事"上。
+  </div>
+  <div class="warnbox">
+    <b>来源口径说明：</b>本文观点与案例（back-pocket evals / discernment horizon / surf the models / 饱和基准升级）均出自 Mike Taylor 原文（Every，2026），属个人经验与框架性观点；
+    文中"AI 时代改写"部分援引的行业背景（LLM-as-a-judge、Claude Evals / OpenAI Evals / promptfoo / Hamming 等评测工具、评测集版本化与饱和度问题）为公开行业实践，<b>非数据结论</b>；
+    文中模型与工具名（Astra / Fable / Sol / Luna / Haiku / Cheap Trick 等）沿用原文命名或作为示例，实际选型请以最新官方信息为准。
+  </div>
+</div>
+
+<footer>
+  Mike Taylor · Every · 2026　|　本页为结构化解读，非原文翻译；"AI 时代改写"部分为延伸视角，已标注来源口径。
+</footer>
+
+</div>
+</body>
+</html>
